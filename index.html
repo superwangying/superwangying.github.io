@@ -266,67 +266,23 @@
 
       <!-- 产品区 -->
       <div class="section-label" id="products">Products</div>
-      <div class="product-grid">
-
-        <!-- ChatArk 卡片 -->
-        <a href="/products/chatark/" class="product-card">
-          <div class="product-card-header">
-            <div class="product-icon">◆</div>
-            <div class="product-status live">LIVE</div>
-          </div>
-          <h3>ChatArk</h3>
-          <p>AI conversation archive manager. Import, browse, and search all your AI chat history in one place. Privacy-first, runs in your browser.</p>
-          <div class="product-tags">
-            <span>Vue 3</span>
-            <span>IndexedDB</span>
-            <span>Privacy</span>
-          </div>
-          <div class="product-link">Explore →</div>
-        </a>
-
-        <!-- 占位卡片 2 -->
-        <div class="product-card">
-          <div class="product-card-header">
-            <div class="product-icon">◇</div>
-            <div class="product-status beta">COMING</div>
-          </div>
-          <h3>Product Two</h3>
-          <p>Coming soon. This space is reserved for your next product launch.</p>
-          <div class="product-tags">
-            <span>Planned</span>
-          </div>
-          <div class="product-link">Learn more →</div>
-        </div>
-
-        <!-- 占位卡片 3 -->
-        <div class="product-card">
-          <div class="product-card-header">
-            <div class="product-icon">○</div>
-            <div class="product-status beta">COMING</div>
-          </div>
-          <h3>Product Three</h3>
-          <p>Coming soon. This space is reserved for your next product launch.</p>
-          <div class="product-tags">
-            <span>Planned</span>
-          </div>
-          <div class="product-link">Learn more →</div>
-        </div>
-
+      <div class="product-grid" id="productGrid">
+        <!-- 产品卡片将由 JavaScript 动态生成 -->
       </div>
 
       <!-- 统计栏 -->
-      <div class="stats-bar">
+      <div class="stats-bar" id="statsBar">
         <div class="stat-item">
-          <div class="stat-value">1</div>
+          <div class="stat-value" id="liveCount">0</div>
           <div class="stat-label">Live Products</div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">2</div>
+          <div class="stat-value" id="devCount">0</div>
           <div class="stat-label">In Development</div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">0</div>
-          <div class="stat-label">Total Users</div>
+          <div class="stat-value" id="totalStars">0</div>
+          <div class="stat-label">Total Stars</div>
         </div>
         <div class="stat-item">
           <div class="stat-value">2026</div>
@@ -362,6 +318,79 @@
     const saved = localStorage.getItem('theme');
     if (saved) setTheme(saved);
     else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+
+    // 动态加载产品数据
+    async function loadProducts() {
+      try {
+        const response = await fetch('/data/products.json');
+        const data = await response.json();
+        const products = data.products || [];
+
+        // 排除 welcome 占位产品，按 order 排序
+        const validProducts = products
+          .filter(p => p.id !== 'welcome')
+          .sort((a, b) => (a.order || 999) - (b.order || 999));
+
+        renderProducts(validProducts);
+        updateStats(validProducts);
+      } catch (error) {
+        console.error('Failed to load products:', error);
+      }
+    }
+
+    // 渲染产品卡片
+    function renderProducts(products) {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+
+      products.forEach(product => {
+        const card = document.createElement(product.links?.demo ? 'a' : 'div');
+        if (product.links?.demo) {
+          card.href = product.links.demo;
+          card.className = 'product-card';
+        } else {
+          card.className = 'product-card';
+        }
+
+        const statusClass = product.status === '活跃开发' || product.status === 'Live' ? 'live' : 'beta';
+        const statusText = product.status === '活跃开发' || product.status === 'Live' ? 'LIVE' : 'BETA';
+
+        const techTags = (product.tech || []).slice(0, 3).map(t => `<span>${t}</span>`).join('');
+
+        card.innerHTML = `
+          <div class="product-card-header">
+            <div class="product-icon">${product.icon || '◇'}</div>
+            <div class="product-status ${statusClass}">${statusText}</div>
+          </div>
+          <h3>${product.name}</h3>
+          <p>${product.tagline}</p>
+          <div class="product-tags">
+            ${techTags}
+          </div>
+          <div class="product-link">${product.links?.demo ? 'Explore →' : 'Learn more →'}</div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    // 更新统计栏
+    function updateStats(products) {
+      const liveCount = products.filter(p =>
+        p.status === '活跃开发' || p.status === 'Live'
+      ).length;
+      const devCount = products.filter(p =>
+        p.status !== '活跃开发' && p.status !== 'Live'
+      ).length;
+      const totalStars = products.reduce((sum, p) => sum + (p.stars || 0), 0);
+
+      document.getElementById('liveCount').textContent = liveCount;
+      document.getElementById('devCount').textContent = devCount;
+      document.getElementById('totalStars').textContent = totalStars;
+    }
+
+    // 页面加载时执行
+    loadProducts();
   </script>
 </body>
 </html>
