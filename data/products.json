@@ -145,8 +145,7 @@
       "tech": ["Vue 3", "TypeScript", "Vite", "Pinia", "Dexie.js", "MiniSearch", "UnoCSS", "Element Plus"],
       "status": "活跃开发",
       "links": {
-        "demo": "https://superwangying.github.io/Tprompt/docs/",
-        "install": "https://superwangying.github.io/Tprompt/prompt-manager-plugin/",
+        "demo": "https://superwangying.github.io/products/prompt-manager/",
         "github": "https://github.com/superwangying"
       },
       "githubRepo": "superwangying.github.io",
