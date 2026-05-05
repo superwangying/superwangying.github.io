@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>轻阅 · 本地小说阅读器</title>
+<style>
+/* ========== CSS Variables & Themes ========== */
+:root {
+  /* Light Theme */
+  --bg-primary: #FAFAF8;
+  --bg-secondary: #F0EFEB;
+  --bg-card: #FFFFFF;
+  --text-primary: #2C2C2C;
+  --text-secondary: #6B6B6B;
+  --text-muted: #A0A0A0;
+  --accent: #C4956A;
+  --accent-hover: #B07D52;
+  --border: #E8E6E1;
+  --shadow: rgba(0,0,0,0.06);
+  --shadow-lg: rgba(0,0,0,0.1);
+  --toolbar-bg: rgba(250,250,248,0.88);
+  --sidebar-bg: #FFFFFF;
+  --dropzone-bg: rgba(196,149,106,0.06);
+  --dropzone-border: rgba(196,149,106,0.3);
+  --scrollbar-thumb: #D0CEC8;
+  --scrollbar-track: transparent;
+  --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
+  --font-body: 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-size-base: 17px;
+  --line-height: 1.9;
+  --reading-width: 720px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1A1A1E;
+  --bg-secondary: #232328;
+  --bg-card: #2A2A30;
+  --text-primary: #E0DDD6;
+  --text-secondary: #9B9B9B;
+  --text-muted: #666666;
+  --accent: #D4A574;
+  --accent-hover: #E0B68A;
+  --border: #3A3A40;
+  --shadow: rgba(0,0,0,0.2);
+  --shadow-lg: rgba(0,0,0,0.35);
+  --toolbar-bg: rgba(26,26,30,0.92);
+  --sidebar-bg: #222228;
+  --dropzone-bg: rgba(212,165,116,0.06);
+  --dropzone-border: rgba(212,165,116,0.3);
+  --scrollbar-thumb: #4A4A52;
+}
+
+[data-theme="sepia"] {
+  --bg-primary: #F5EDE0;
+  --bg-secondary: #EDE3D3;
+  --bg-card: #FAF5EC;
+  --text-primary: #3E3529;
+  --text-secondary: #7A6E5E;
+  --text-muted: #A89D8E;
+  --accent: #8B6B4A;
+  --accent-hover: #7A5C3D;
+  --border: #DDD3C3;
+  --shadow: rgba(62,53,41,0.06);
+  --shadow-lg: rgba(62,53,41,0.1);
+  --toolbar-bg: rgba(245,237,224,0.92);
+  --sidebar-bg: #FAF5EC;
+  --dropzone-bg: rgba(139,107,74,0.06);
+  --dropzone-border: rgba(139,107,74,0.3);
+  --scrollbar-thumb: #C8BBAA;
+}
+
+[data-theme="green"] {
+  --bg-primary: #EFF3EB;
+  --bg-secondary: #E2E8DC;
+  --bg-card: #F5F8F2;
+  --text-primary: #2D3A28;
+  --text-secondary: #5E6E56;
+  --text-muted: #8E9A86;
+  --accent: #6B8F5E;
+  --accent-hover: #5A7D4E;
+  --border: #CDD6C6;
+  --shadow: rgba(45,58,40,0.06);
+  --shadow-lg: rgba(45,58,40,0.1);
+  --toolbar-bg: rgba(239,243,235,0.92);
+  --sidebar-bg: #F5F8F2;
+  --dropzone-bg: rgba(107,143,94,0.06);
+  --dropzone-border: rgba(107,143,94,0.3);
+  --scrollbar-thumb: #B0BBA8;
+}
+
+/* ========== Google Fonts ========== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap');
+
+/* ========== Reset & Base ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: var(--font-size-base);
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: var(--line-height);
+  transition: background var(--transition), color var(--transition);
+  overflow: hidden;
+  height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+
+/* ========== App Layout ========== */
+.app {
+  display: flex;
+  height: 100vh;
+  position: relative;
+}
+
+/* ========== Sidebar ========== */
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition), background var(--transition);
+  z-index: 20;
+  position: relative;
+}
+
+.sidebar.collapsed {
+  transform: translateX(-100%);
+  position: absolute;
+  height: 100%;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-brand .logo {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.sidebar-brand h1 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+}
+
+.sidebar-close {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all var(--transition);
+}
+
+.sidebar-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.sidebar-actions {
+  padding: 12px 20px;
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  flex: 1;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  color: white;
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Chapter List */
+.chapter-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+
+.chapter-list-header {
+  padding: 8px 8px 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.chapter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 14px;
+  color: var(--text-secondary);
+  position: relative;
+}
+
+.chapter-item:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.chapter-item.active {
+  background: var(--dropzone-bg);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.chapter-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.chapter-item .chapter-index {
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.chapter-item .chapter-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chapter-item .chapter-ext {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ========== Main Content ========== */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ========== Toolbar ========== */
+.toolbar {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--toolbar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+  transition: background var(--transition);
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all var(--transition);
+  position: relative;
+}
+
+.toolbar-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.toolbar-btn.active {
+  color: var(--accent);
+}
+
+.toolbar-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.toolbar-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Font Size Controls */
+.font-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.font-controls .toolbar-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.font-controls .font-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Theme Dropdown */
+.theme-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 8px 32px var(--shadow-lg);
+  display: none;
+  z-index: 100;
+  min-width: 160px;
+  animation: dropdownIn 0.2s ease;
+}
+
+.theme-dropdown.show { display: block; }
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.theme-option:hover { background: var(--bg-secondary); }
+.theme-option.active { background: var(--dropzone-bg); color: var(--accent); }
+
+.theme-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.theme-option.active .theme-dot::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ========== Reading Area ========== */
+.reading-area {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 80px;
+  scroll-behavior: smooth;
+}
+
+.reading-content {
+  max-width: var(--reading-width);
+  width: 100%;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reading-content h1 {
+  font-family: var(--font-display);
+  font-size: 1.8em;
+  font-weight: 700;
+  margin-bottom: 0.6em;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.reading-content h2 {
+  font-family: var(--font-display);
+  font-size: 1.4em;
+  font-weight: 600;
+  margin: 1.5em 0 0.5em;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.reading-content h3 {
+  font-family: var(--font-display);
+  font-size: 1.15em;
+  font-weight: 600;
+  margin: 1.2em 0 0.4em;
+  color: var(--text-primary);
+}
+
+.reading-content p {
+  margin-bottom: 1em;
+  text-indent: 2em;
+  color: var(--text-primary);
+}
+
+.reading-content p:first-of-type {
+  text-indent: 0;
+}
+
+.reading-content strong { font-weight: 600; }
+.reading-content em { font-style: italic; }
+.reading-content blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 0.5em 1em;
+  margin: 1em 0;
+  color: var(--text-secondary);
+  background: var(--dropzone-bg);
+  border-radius: 0 8px 8px 0;
+}
+
+.reading-content hr {
+  border: none;
+  height: 1px;
+  background: var(--border);
+  margin: 2em 0;
+}
+
+.reading-content ul, .reading-content ol {
+  padding-left: 2em;
+  margin-bottom: 1em;
+}
+
+.reading-content li {
+  margin-bottom: 0.3em;
+}
+
+.reading-content code {
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.reading-content pre {
+  background: var(--bg-secondary);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.reading-content pre code {
+  background: none;
+  padding: 0;
+}
+
+/* ========== Welcome / Drop Zone ========== */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px;
+}
+
+.welcome-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 24px;
+  opacity: 0.15;
+}
+
+.welcome h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.welcome p {
+  color: var(--text-muted);
+  font-size: 14px;
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+.dropzone {
+  margin-top: 32px;
+  width: 100%;
+  max-width: 420px;
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  transition: all var(--transition);
+  cursor: pointer;
+  background: transparent;
+}
+
+.dropzone:hover, .dropzone.drag-over {
+  border-color: var(--accent);
+  background: var(--dropzone-bg);
+  transform: scale(1.01);
+}
+
+.dropzone.drag-over {
+  box-shadow: 0 0 0 4px var(--dropzone-bg);
+}
+
+.dropzone-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 12px;
+  color: var(--accent);
+  opacity: 0.6;
+}
+
+.dropzone h3 {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.dropzone p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Global Drag Overlay */
+.drag-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: overlayIn 0.2s ease;
+}
+
+.drag-overlay.show { display: flex; }
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.drag-overlay-content {
+  text-align: center;
+  color: white;
+}
+
+.drag-overlay-content svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.8;
+}
+
+.drag-overlay-content h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.drag-overlay-content p {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* ========== Bottom Bar ========== */
+.bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: var(--toolbar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  z-index: 10;
+  transition: background var(--transition);
+}
+
+.bottom-bar .toolbar-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.bottom-bar .toolbar-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.bottom-bar .progress-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  box-shadow: 0 4px 24px var(--shadow-lg);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ========== Empty State ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  height: 100%;
+}
+
+.empty-state svg {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+/* ========== Mobile Responsive ========== */
+@media (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    height: 100%;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 24px var(--shadow-lg);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close {
+    display: flex;
+  }
+
+  .reading-area {
+    padding: 24px 16px 72px;
+  }
+
+  .reading-content h1 { font-size: 1.5em; }
+  .reading-content h2 { font-size: 1.25em; }
+
+  .toolbar-title {
+    max-width: 180px;
+    font-size: 14px;
+  }
+
+  .welcome { padding: 24px; }
+  .dropzone { padding: 32px 24px; }
+}
+
+/* ========== Selection ========== */
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* ========== Loading Shimmer ========== */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.loading-line {
+  height: 1em;
+  margin-bottom: 1em;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border) 50%, var(--bg-secondary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="logo">阅</div>
+        <h1>轻阅</h1>
+      </div>
+      <button class="sidebar-close" id="sidebarClose" title="关闭侧栏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sidebar-actions">
+      <button class="btn btn-primary" id="openFolder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        打开文件夹
+      </button>
+      <button class="btn" id="openFile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        打开文件
+      </button>
+    </div>
+    <div class="chapter-list" id="chapterList">
+      <div class="empty-state" id="chapterEmpty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        <span>暂无章节<br>打开文件夹或拖拽文件开始阅读</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="toolbar-btn" id="toggleSidebar" title="章节目录">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="toolbar-title" id="toolbarTitle">轻阅 · 本地小说阅读器</span>
+      </div>
+      <div class="toolbar-right">
+        <div class="font-controls">
+          <button class="toolbar-btn" id="fontDecrease" title="缩小字号">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <span class="font-label" id="fontLabel">17</span>
+          <button class="toolbar-btn" id="fontIncrease" title="放大字号">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+        <div style="position:relative">
+          <button class="toolbar-btn" id="themeBtn" title="切换主题">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+          <div class="theme-dropdown" id="themeDropdown">
+            <button class="theme-option active" data-theme="light">
+              <span class="theme-dot" style="background:#FAFAF8; border-color:#E8E6E1"></span>
+              日光白
+            </button>
+            <button class="theme-option" data-theme="sepia">
+              <span class="theme-dot" style="background:#F5EDE0; border-color:#DDD3C3"></span>
+              护眼黄
+            </button>
+            <button class="theme-option" data-theme="green">
+              <span class="theme-dot" style="background:#EFF3EB; border-color:#CDD6C6"></span>
+              森林绿
+            </button>
+            <button class="theme-option" data-theme="dark">
+              <span class="theme-dot" style="background:#1A1A1E; border-color:#3A3A40"></span>
+              暗夜黑
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reading Area -->
+    <div class="reading-area" id="readingArea">
+      <!-- Welcome Screen -->
+      <div class="welcome" id="welcomeScreen">
+        <svg class="welcome-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+        </svg>
+        <h2>开始你的阅读之旅</h2>
+        <p>打开本地小说文件夹浏览章节，或将文件拖拽到此处直接阅读</p>
+        <div class="dropzone" id="dropzone">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <h3>拖拽文件到此处</h3>
+          <p>支持 .txt 和 .md 格式</p>
+        </div>
+      </div>
+
+      <!-- Content (hidden by default) -->
+      <div class="reading-content" id="readingContent" style="display:none"></div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar" id="bottomBar" style="display:none">
+      <button class="toolbar-btn" id="prevChapter" title="上一章">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="progress-text" id="progressText">1 / 1</span>
+      <button class="toolbar-btn" id="nextChapter" title="下一章">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </main>
+</div>
+
+<!-- Drag Overlay -->
+<div class="drag-overlay" id="dragOverlay">
+  <div class="drag-overlay-content">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <h3>释放以开始阅读</h3>
+    <p>支持 .txt 和 .md 格式文件</p>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Hidden file inputs -->
+<input type="file" id="folderInput" webkitdirectory multiple style="display:none" accept=".txt,.md,.text,.markdown">
+<input type="file" id="fileInput" multiple style="display:none" accept=".txt,.md,.text,.markdown">
+
+<script>
+(function() {
+  'use strict';
+
+  // ========== State ==========
+  const state = {
+    chapters: [],       // { name, file, ext }
+    currentIndex: -1,
+    theme: 'light',
+    fontSize: 17,
+    sidebarOpen: window.innerWidth > 768,
+  };
+
+  // ========== DOM Elements ==========
+  const $ = (sel) => document.querySelector(sel);
+  const sidebar = $('#sidebar');
+  const chapterList = $('#chapterList');
+  const chapterEmpty = $('#chapterEmpty');
+  const readingArea = $('#readingArea');
+  const readingContent = $('#readingContent');
+  const welcomeScreen = $('#welcomeScreen');
+  const toolbarTitle = $('#toolbarTitle');
+  const bottomBar = $('#bottomBar');
+  const progressText = $('#progressText');
+  const fontLabel = $('#fontLabel');
+  const themeDropdown = $('#themeDropdown');
+  const dragOverlay = $('#dragOverlay');
+  const toast = $('#toast');
+  const folderInput = $('#folderInput');
+  const fileInput = $('#fileInput');
+
+  // ========== Init ==========
+  function init() {
+    loadSettings();
+    applyTheme(state.theme);
+    applyFontSize(state.fontSize);
+    updateSidebarState();
+    bindEvents();
+  }
+
+  // ========== Settings ==========
+  function loadSettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('qingyue_settings') || '{}');
+      if (saved.theme) state.theme = saved.theme;
+      if (saved.fontSize) state.fontSize = saved.fontSize;
+      if (saved.sidebarOpen !== undefined) state.sidebarOpen = saved.sidebarOpen;
+    } catch(e) {}
+  }
+
+  function saveSettings() {
+    localStorage.setItem('qingyue_settings', JSON.stringify({
+      theme: state.theme,
+      fontSize: state.fontSize,
+      sidebarOpen: state.sidebarOpen,
+    }));
+  }
+
+  // ========== Theme ==========
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    state.theme = theme;
+    document.querySelectorAll('.theme-option').forEach(opt => {
+      opt.classList.toggle('active', opt.dataset.theme === theme);
+    });
+    saveSettings();
+  }
+
+  // ========== Font Size ==========
+  function applyFontSize(size) {
+    size = Math.max(12, Math.min(28, size));
+    state.fontSize = size;
+    document.documentElement.style.setProperty('--font-size-base', size + 'px');
+    fontLabel.textContent = size;
+    saveSettings();
+  }
+
+  // ========== Sidebar ==========
+  function updateSidebarState() {
+    if (window.innerWidth > 768) {
+      sidebar.classList.toggle('collapsed', !state.sidebarOpen);
+    } else {
+      sidebar.classList.remove('collapsed');
+      sidebar.classList.toggle('open', state.sidebarOpen);
+    }
+  }
+
+  function toggleSidebar() {
+    state.sidebarOpen = !state.sidebarOpen;
+    updateSidebarState();
+    saveSettings();
+  }
+
+  // ========== File Handling ==========
+  function handleFiles(files) {
+    const validFiles = Array.from(files).filter(f => {
+      const ext = f.name.split('.').pop().toLowerCase();
+      return ['txt', 'md', 'text', 'markdown'].includes(ext);
+    });
+
+    if (validFiles.length === 0) {
+      showToast('未找到支持的文件格式（.txt / .md）');
+      return;
+    }
+
+    // Sort by name naturally
+    validFiles.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN', { numeric: true }));
+
+    state.chapters = validFiles.map(f => {
+      const ext = f.name.split('.').pop().toLowerCase();
+      const name = f.name.replace(/\.(txt|md|text|markdown)$/i, '');
+      return { name, file: f, ext: ext === 'markdown' ? 'md' : ext };
+    });
+
+    renderChapterList();
+
+    // Auto-select first chapter
+    if (state.chapters.length > 0) {
+      selectChapter(0);
+      showToast(`已加载 ${state.chapters.length} 个章节`);
+    }
+  }
+
+  function renderChapterList() {
+    // Remove old items (keep empty state)
+    chapterList.querySelectorAll('.chapter-item').forEach(el => el.remove());
+
+    if (state.chapters.length === 0) {
+      chapterEmpty.style.display = 'flex';
+      return;
+    }
+
+    chapterEmpty.style.display = 'none';
+
+    const header = document.createElement('div');
+    header.className = 'chapter-list-header';
+    header.textContent = `共 ${state.chapters.length} 章`;
+    chapterList.insertBefore(header, chapterEmpty);
+
+    state.chapters.forEach((ch, i) => {
+      const item = document.createElement('div');
+      item.className = 'chapter-item';
+      item.dataset.index = i;
+      item.innerHTML = `
+        <span class="chapter-index">${String(i + 1).padStart(2, '0')}</span>
+        <span class="chapter-name" title="${ch.name}">${ch.name}</span>
+        <span class="chapter-ext">${ch.ext}</span>
+      `;
+      item.addEventListener('click', () => selectChapter(i));
+      chapterList.appendChild(item);
+    });
+  }
+
+  function selectChapter(index) {
+    if (index < 0 || index >= state.chapters.length) return;
+
+    state.currentIndex = index;
+    const chapter = state.chapters[index];
+
+    // Update active state
+    chapterList.querySelectorAll('.chapter-item').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+
+    // Scroll active into view
+    const activeItem = chapterList.querySelector('.chapter-item.active');
+    if (activeItem) {
+      activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    // Show loading
+    welcomeScreen.style.display = 'none';
+    readingContent.style.display = 'block';
+    readingContent.innerHTML = Array(8).fill('<div class="loading-line" style="width:90%"></div>').join('') +
+      Array(4).fill('<div class="loading-line" style="width:75%"></div>').join('');
+
+    // Read file
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const html = chapter.ext === 'md' ? renderMarkdown(text) : renderPlainText(text);
+      readingContent.innerHTML = html;
+      readingContent.style.animation = 'none';
+      readingContent.offsetHeight; // trigger reflow
+      readingContent.style.animation = 'fadeIn 0.4s ease';
+    };
+    reader.onerror = () => {
+      readingContent.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px">文件读取失败</p>';
+    };
+    reader.readAsText(chapter.file, 'UTF-8');
+
+    // Update UI
+    toolbarTitle.textContent = chapter.name;
+    bottomBar.style.display = 'flex';
+    progressText.textContent = `${index + 1} / ${state.chapters.length}`;
+
+    // Save reading progress
+    saveProgress();
+
+    // Close sidebar on mobile
+    if (window.innerWidth <= 768) {
+      state.sidebarOpen = false;
+      updateSidebarState();
+    }
+  }
+
+  // ========== Text Rendering ==========
+  function renderPlainText(text) {
+    // Split by double newlines for paragraphs
+    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
+    if (paragraphs.length === 0) return '<p>' + escapeHtml(text) + '</p>';
+
+    return paragraphs.map(p => {
+      p = p.trim();
+      // Check if it's a title line (short, no period at end)
+      const lines = p.split('\n').filter(l => l.trim());
+      if (lines.length === 1 && lines[0].length < 40 && !/[。！？；，、.!?;,\u2026]$/.test(lines[0])) {
+        return `<h2>${escapeHtml(lines[0])}</h2>`;
+      }
+      return lines.map(line => `<p>${escapeHtml(line.trim())}</p>`).join('');
+    }).join('');
+  }
+
+  function renderMarkdown(text) {
+    let html = text;
+
+    // Escape HTML first
+    html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    // Code blocks (``` ... ```)
+    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+      return `<pre><code>${code.trim()}</code></pre>`;
+    });
+
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Headers
+    html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
+    html = html.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>');
+    html = html.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
+    html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
+
+    // Horizontal rule
+    html = html.replace(/^---+$/gm, '<hr>');
+
+    // Bold + Italic
+    html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+    // Blockquote
+    html = html.replace(/^&gt;\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+
+    // Ordered list
+    html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<oli>$1.$2</oli>');
+
+    // Unordered list
+    html = html.replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>');
+    html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+
+    // Convert ordered list items
+    html = html.replace(/((?:<oli>.*<\/oli>\n?)+)/g, (match) => {
+      return '<ol>' + match.replace(/<\/?oli>/g, (tag) => tag === '<oli>' ? '<li>' : '</li>') + '</ol>';
+    });
+
+    // Paragraphs
+    html = html.replace(/^(?!<[hupblo]|<li|<hr|<pre|<code)(.+)$/gm, '<p>$1</p>');
+
+    // Clean up empty paragraphs
+    html = html.replace(/<p>\s*<\/p>/g, '');
+
+    return html;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // ========== Progress ==========
+  function saveProgress() {
+    if (state.chapters.length === 0) return;
+    const ch = state.chapters[state.currentIndex];
+    localStorage.setItem('qingyue_progress', JSON.stringify({
+      fileName: ch.name,
+      index: state.currentIndex,
+    }));
+  }
+
+  function restoreProgress() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('qingyue_progress') || '{}');
+      if (saved.fileName && state.chapters.length > 0) {
+        const idx = state.chapters.findIndex(c => c.name === saved.fileName);
+        if (idx >= 0) {
+          selectChapter(idx);
+          return true;
+        }
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  // ========== Toast ==========
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // ========== Drag & Drop ==========
+  let dragCounter = 0;
+
+  function handleDragEnter(e) {
+    e.preventDefault();
+    dragCounter++;
+    dragOverlay.classList.add('show');
+  }
+
+  function handleDragLeave(e) {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter <= 0) {
+      dragCounter = 0;
+      dragOverlay.classList.remove('show');
+    }
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    dragCounter = 0;
+    dragOverlay.classList.remove('show');
+
+    const items = e.dataTransfer.items;
+    if (items) {
+      const filePromises = [];
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : null;
+        if (item) {
+          filePromises.push(traverseEntry(item));
+        } else if (items[i].kind === 'file') {
+          const file = items[i].getAsFile();
+          if (file) filePromises.push(Promise.resolve([file]));
+        }
+      }
+      Promise.all(filePromises).then(results => {
+        const allFiles = results.flat();
+        handleFiles(allFiles);
+      });
+    } else {
+      handleFiles(e.dataTransfer.files);
+    }
+  }
+
+  function traverseEntry(entry) {
+    return new Promise((resolve) => {
+      if (entry.isFile) {
+        entry.file(file => resolve([file]), () => resolve([]));
+      } else if (entry.isDirectory) {
+        const reader = entry.createReader();
+        const allEntries = [];
+        const readBatch = () => {
+          reader.readEntries(entries => {
+            if (entries.length === 0) {
+              Promise.all(allEntries.map(traverseEntry)).then(results => {
+                resolve(results.flat());
+              });
+            } else {
+              allEntries.push(...entries);
+              readBatch();
+            }
+          }, () => resolve([]));
+        };
+        readBatch();
+      } else {
+        resolve([]);
+      }
+    });
+  }
+
+  // ========== Event Bindings ==========
+  function bindEvents() {
+    // Sidebar toggle
+    $('#toggleSidebar').addEventListener('click', toggleSidebar);
+    $('#sidebarClose').addEventListener('click', () => {
+      state.sidebarOpen = false;
+      updateSidebarState();
+      saveSettings();
+    });
+
+    // Open folder
+    $('#openFolder').addEventListener('click', () => folderInput.click());
+    folderInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFiles(e.target.files);
+        if (!restoreProgress()) selectChapter(0);
+      }
+    });
+
+    // Open file
+    $('#openFile').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFiles(e.target.files);
+      }
+    });
+
+    // Font size
+    $('#fontDecrease').addEventListener('click', () => applyFontSize(state.fontSize - 1));
+    $('#fontIncrease').addEventListener('click', () => applyFontSize(state.fontSize + 1));
+
+    // Theme
+    $('#themeBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      themeDropdown.classList.toggle('show');
+    });
+
+    document.querySelectorAll('.theme-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        applyTheme(opt.dataset.theme);
+        themeDropdown.classList.remove('show');
+      });
+    });
+
+    document.addEventListener('click', () => themeDropdown.classList.remove('show'));
+
+    // Chapter navigation
+    $('#prevChapter').addEventListener('click', () => {
+      if (state.currentIndex > 0) selectChapter(state.currentIndex - 1);
+    });
+    $('#nextChapter').addEventListener('click', () => {
+      if (state.currentIndex < state.chapters.length - 1) selectChapter(state.currentIndex + 1);
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && state.currentIndex > 0) {
+        selectChapter(state.currentIndex - 1);
+      } else if (e.key === 'ArrowRight' && state.currentIndex < state.chapters.length - 1) {
+        selectChapter(state.currentIndex + 1);
+      } else if (e.key === '+' || e.key === '=') {
+        applyFontSize(state.fontSize + 1);
+      } else if (e.key === '-') {
+        applyFontSize(state.fontSize - 1);
+      }
+    });
+
+    // Drag & Drop
+    document.addEventListener('dragenter', handleDragEnter);
+    document.addEventListener('dragleave', handleDragLeave);
+    document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('drop', handleDrop);
+
+    // Dropzone click
+    $('#dropzone').addEventListener('click', () => fileInput.click());
+
+    // Window resize
+    window.addEventListener('resize', () => {
+      updateSidebarState();
+    });
+  }
+
+  // ========== Start ==========
+  init();
+})();
+</script>
+</body>
+</html>
