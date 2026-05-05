@@ -1,0 +1,49 @@
+{
+  "conversations": [
+    {
+      "title": "Tprompt 浏览器扩展开发 - P0/P1/P3 实现方案",
+      "messages": [
+        {
+          "role": "user",
+          "content": "继续下一步（P1）：可以考虑实现 GitHub Pages 自动部署，让站点可以通过 URL 直接访问，无需下载文件。",
+          "created_at": "2026-05-05T21:10:00+08:00"
+        },
+        {
+          "role": "assistant",
+          "content": "好的，继续实现 P1 功能：GitHub Pages 自动部署。\n\n## P1 实现方案\n\n我将创建一个完整的部署方案，包括：\n1. **部署脚本** - 自动生成站点文件并准备部署\n2. **GitHub Actions workflow** - 自动化部署到 GitHub Pages\n3. **部署文档** - 详细的配置和使用说明",
+          "created_at": "2026-05-05T21:11:00+08:00"
+        },
+        {
+          "role": "user",
+          "content": "清除刚才的P1第二步的所有动作",
+          "created_at": "2026-05-05T21:15:00+08:00"
+        },
+        {
+          "role": "assistant",
+          "content": "已清除。刚才创建的两个目录已删除：\n- `scripts/` ❌\n- `.github/workflows/` ❌",
+          "created_at": "2026-05-05T21:15:30+08:00"
+        },
+        {
+          "role": "user",
+          "content": "启动项目构建，我需要扩展来安装该插件，查看P0的实现",
+          "created_at": "2026-05-05T21:16:00+08:00"
+        },
+        {
+          "role": "assistant",
+          "content": "✅ 构建成功！现在查看 P0 实现的关键文件。\n\n## ✅ P0 实现总结\n\n### 构建状态\n✅ 编译成功，所有 TypeScript 错误已修复\n\n### P0 实现文件\n\n| 文件 | 功能 |\n|------|------|\n| `src/composables/useExportSite.ts` | 静态站点导出核心逻辑（726行）|\n| `src/components/ImportExport.vue` | UI 界面集成（含 site 格式选项）|\n| `src/composables/useImportExport.ts` | 扩展 ExportFormat 类型 |\n\n### 静态站点功能\n\n| 功能 | 说明 |\n|------|------|\n| 📱 移动端响应式 | max-width: 640px |\n| 🔍 全文搜索 | 标题/内容/标签 |\n| 📋 一键复制 | Clipboard API |\n| 🌙 暗色模式 | 自动跟随系统 |\n| 📲 分类筛选 | 标签栏切换 |\n| 💾 离线使用 | 数据内联 |\n| 📲 PWA 支持 | manifest.json + sw.js |\n\n### 使用方式\n1. 打开扩展选项页 → 点击导入/导出图标\n2. 选择「静态站点」格式\n3. 选择导出范围（全部/已收藏）\n4. 点击「导出 静态站点」\n5. 下载 `prompt-site-YYYY-MM-DD.html`",
+          "created_at": "2026-05-05T21:20:00+08:00"
+        },
+        {
+          "role": "user",
+          "content": "解释一下：P3 PWA \"添加到主屏幕\" 1h 类原生 App 体验，是说可以将导出的移动端浏览器可访问的HTML，添加到手机主屏幕，实现类似移动端APP的打开效果，来使用HTML",
+          "created_at": "2026-05-05T21:26:00+08:00"
+        },
+        {
+          "role": "assistant",
+          "content": "## P3: PWA「添加到主屏幕」解释\n\n### 核心概念\n\nPWA（Progressive Web App）让 **网页** 可以像 **原生 App** 一样被安装到手机主屏幕，点击图标后：\n- 全屏运行（无浏览器地址栏）\n- 有独立的图标\n- 有启动画面（splash screen）\n- 可以离线使用\n\n### 与导出 HTML 的关系\n\n```\n[扩展导出] → prompt-site.html → [部署到服务器] → [手机浏览器访问] → [添加到主屏幕]\n```\n\n| 步骤 | 说明 |\n|------|------|\n| ① 导出 | 扩展内点击「导出静态站点」，下载 `prompt-site-2026-05-05.html` |\n| ② 部署 | 将 HTML 放到可访问的地方（本地文件 / GitHub Pages / 任意服务器）|\n| ③ 打开 | 手机浏览器访问该 URL |\n| ④ 添加 | 浏览器菜单 → **「添加到主屏幕」** |\n| ⑤ 使用 | 主屏幕出现图标，点击后 **全屏打开**，像原生 App 一样 |\n\n### 技术实现（已在 P0 中准备）\n\n`useExportSite.ts` 中已生成 PWA 所需文件：\n\n| 文件 | 作用 |\n|------|------|\n| `manifest.json` | 告诉浏览器「这是一个 PWA」，定义图标、名称、显示模式 |\n| `sw.js` (Service Worker) | 离线缓存，让站点可以离线访问 |\n\nmanifest.json 关键配置：\n```json\n{\n  \"display\": \"standalone\",\n  \"start_url\": \"/\",\n  \"icons\": [...]\n}\n```\n\n### 用户体验对比\n\n| 方式 | 打开方式 | 界面 | 离线 |\n|------|---------|------|------|\n| 普通书签 | 打开浏览器 → 输入网址 | 有地址栏、底部工具栏 | ❌ |\n| **PWA 添加到主屏幕** | **直接点击图标** | **全屏，无浏览器 UI** | **✅ 可离线** |\n\n### 当前状态\n\n- ✅ P0 已生成 `manifest.json` 和 `sw.js`\n- ⏳ P1（GitHub Pages 部署）完成后，URL 访问更方便\n- ⏳ P3 需要在部署后，手机浏览器访问 → 添加主屏幕",
+          "created_at": "2026-05-05T21:29:00+08:00"
+        }
+      ]
+    }
+  ]
+}

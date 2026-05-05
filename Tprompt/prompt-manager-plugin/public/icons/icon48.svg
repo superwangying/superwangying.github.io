@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <!-- 六边形深灰渐变 -->
+    <linearGradient id="hex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a4f5a"/>
+      <stop offset="100%" stop-color="#373b44"/>
+    </linearGradient>
+    <!-- 底层垫片的微妙阴影 -->
+    <filter id="padShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000" flood-opacity=".06"/>
+    </filter>
+  </defs>
+  <rect x="0" y="0" width="48" height="48" rx="8.64" fill="#eef0f4" filter="url(#padShadow)"/>
+  <polygon points="24.00,5.76 39.80,14.88 39.80,33.12 24.00,42.24 8.20,33.12 8.20,14.88" fill="url(#hex)"/>
+  <g transform="translate(10.4, 11.2)">
+    <rect x="2.4" y="0.8" width="16.8" height="21.6" rx="1.6" stroke="white" stroke-width="1.5" fill="none"/>
+    <path d="M14.4 0.8 L19.2 5.6 L19.2 3.2 Q19.2 0.8 16.8 0.8 Z" fill="white" opacity=".85"/>
+    <line x1="5.6" y1="7.6" x2="16.0" y2="7.6" stroke="white" stroke-width="1.0" stroke-linecap="round"/>
+    <line x1="5.6" y1="11.2" x2="14.0" y2="11.2" stroke="white" stroke-width="1.0" stroke-linecap="round" opacity=".65"/>
+    <path d="M5.6 18.8 L8.4 21.2 L5.6 23.6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <line x1="9.2" y1="23.6" x2="13.6" y2="23.6" stroke="white" stroke-width="1.0" stroke-linecap="round"/>
+  </g>
+</svg>

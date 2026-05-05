@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@iconify-json/feather": "^1.2.1"
+  },
+  "dependencies": {
+    "pdfkit": "^0.18.0"
+  }
+}

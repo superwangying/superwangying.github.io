@@ -1,0 +1,23 @@
+[33m[plugin unocss:global:build:scan] [unocss] "virtual:uno.css" is being imported multiple times in different files, using the first occurrence: "D:/Tprompt/prompt-manager-plugin/src/popup/__uno.css"[39m
+[33m[lightningcss minify] 'deep' is not recognized as a valid pseudo-element. Did you mean ':deep' (pseudo-class) or is this a typo?
+68 |  
+69 |  /* ---- 搜索高亮 ---- */
+70 |  [data-v-1c669974]::deep(.search-highlight) {
+   |                          ^
+71 |    background: rgba(251, 191, 36, 0.35);
+72 |    color: inherit;[39m
+[33m[lightningcss minify] 'deep' is not recognized as a valid pseudo-element. Did you mean ':deep' (pseudo-class) or is this a typo?
+74 |    padding: 0 1px;
+75 |  }
+76 |  [data-theme='dark'][data-v-1c669974] ::deep(.search-highlight) {
+   |                                              ^
+77 |    background: rgba(251, 191, 36, 0.2);
+78 |    color: #fbbf24;[39m
+[33m[33m[PLUGIN_TIMINGS] Warning:[0m Your build spent significant time in plugins. Here is a breakdown:
+  - unocss:global:build:generate (33%)
+  - vite:css-post (19%)
+  - unocss:global:build:scan (14%)
+  - vite:vue (8%)
+  - unocss:transformers:default (8%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+[39m

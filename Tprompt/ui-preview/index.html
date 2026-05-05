@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Manager · UI 设计预览</title>
+<style>
+  /* ============================
+     设计令牌 Design Tokens
+  ============================ */
+  :root {
+    /* 主色 */
+    --primary-50:  #f0f4ff;
+    --primary-100: #e0e9ff;
+    --primary-200: #c7d7fe;
+    --primary-400: #818cf8;
+    --primary-500: #6366f1;
+    --primary-600: #4f46e5;
+    --primary-700: #4338ca;
+
+    /* 中性色 */
+    --gray-50:  #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+
+    /* 语义色 */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger:  #ef4444;
+    --info:    #3b82f6;
+
+    /* 分类标签色板 */
+    --tag-purple: #8b5cf6;
+    --tag-blue:   #3b82f6;
+    --tag-green:  #10b981;
+    --tag-orange: #f97316;
+    --tag-pink:   #ec4899;
+    --tag-teal:   #14b8a6;
+
+    /* 字体 */
+    --font-sans: 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* 圆角 */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+
+    /* 阴影 */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.10);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,.12);
+    --shadow-focus: 0 0 0 3px rgba(99,102,241,.25);
+
+    /* 过渡 */
+    --transition: 150ms ease;
+    --transition-md: 250ms ease;
+
+    /* 侧边栏宽度 */
+    --sidebar-w: 220px;
+    --header-h: 56px;
+  }
+
+  /* ============================
+     Reset & Base
+  ============================ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; font-size: inherit; }
+
+  /* ============================
+     导航标签页（页面切换）
+  ============================ */
+  .demo-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    display: flex; align-items: center; gap: 4px;
+    background: var(--gray-900); padding: 8px 16px;
+    font-size: 12px;
+  }
+  .demo-nav span {
+    color: var(--gray-400); margin-right: 8px; font-weight: 600;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+  .demo-nav button {
+    color: var(--gray-300); padding: 4px 12px;
+    border-radius: var(--radius-full); transition: var(--transition);
+  }
+  .demo-nav button:hover { background: var(--gray-700); color: #fff; }
+  .demo-nav button.active { background: var(--primary-600); color: #fff; }
+
+  /* ============================
+     页面容器
+  ============================ */
+  .page { display: none; padding-top: 40px; }
+  .page.active { display: block; }
+
+  /* ============================
+     ① Options 主界面
+  ============================ */
+  .options-shell {
+    display: flex; flex-direction: column;
+    height: calc(100vh - 40px);
+    background: var(--gray-50);
+  }
+
+  /* TopBar */
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    height: var(--header-h); padding: 0 20px;
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+  }
+  .topbar-brand {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 700; font-size: 16px; color: var(--gray-900);
+    white-space: nowrap;
+  }
+  .topbar-brand .logo {
+    width: 28px; height: 28px; border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 14px;
+  }
+  .topbar-search {
+    flex: 1; max-width: 480px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--gray-100); border: 1.5px solid transparent;
+    border-radius: var(--radius-lg); padding: 0 12px; height: 36px;
+    transition: var(--transition);
+  }
+  .topbar-search:focus-within {
+    background: #fff; border-color: var(--primary-400);
+    box-shadow: var(--shadow-focus);
+  }
+  .topbar-search input {
+    flex: 1; border: none; background: none; outline: none;
+    font-size: 13px; color: var(--gray-800);
+  }
+  .topbar-search input::placeholder { color: var(--gray-400); }
+  .topbar-search .search-icon { color: var(--gray-400); font-size: 14px; }
+  .topbar-search .kbd {
+    background: var(--gray-200); border-radius: 4px;
+    padding: 1px 5px; font-size: 11px; color: var(--gray-500);
+    font-family: var(--font-mono);
+  }
+  .topbar-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+  .btn-icon {
+    width: 34px; height: 34px; border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gray-500); transition: var(--transition);
+    font-size: 15px;
+  }
+  .btn-icon:hover { background: var(--gray-100); color: var(--gray-700); }
+  .btn-outline {
+    display: flex; align-items: center; gap: 5px;
+    height: 32px; padding: 0 12px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--gray-200); color: var(--gray-600);
+    font-size: 13px; transition: var(--transition);
+  }
+  .btn-outline:hover { border-color: var(--primary-400); color: var(--primary-600); }
+  .btn-primary {
+    display: flex; align-items: center; gap: 5px;
+    height: 32px; padding: 0 14px; border-radius: var(--radius-md);
+    background: var(--primary-600); color: #fff;
+    font-size: 13px; font-weight: 500; transition: var(--transition);
+  }
+  .btn-primary:hover { background: var(--primary-700); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+  /* Body = sidebar + main */
+  .options-body {
+    display: flex; flex: 1; overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    background: #fff; border-right: 1px solid var(--gray-200);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+    padding: 12px 8px;
+  }
+  .sidebar-section-label {
+    padding: 4px 10px; font-size: 11px; font-weight: 600;
+    color: var(--gray-400); letter-spacing: .06em;
+    text-transform: uppercase; margin-top: 8px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; border-radius: var(--radius-md);
+    color: var(--gray-600); font-size: 13px;
+    transition: var(--transition); cursor: pointer;
+    user-select: none;
+  }
+  .sidebar-item:hover { background: var(--gray-100); color: var(--gray-800); }
+  .sidebar-item.active {
+    background: var(--primary-50); color: var(--primary-700); font-weight: 500;
+  }
+  .sidebar-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-item .badge {
+    margin-left: auto; background: var(--gray-200); color: var(--gray-500);
+    border-radius: var(--radius-full); padding: 1px 6px; font-size: 11px;
+  }
+  .sidebar-item.active .badge { background: var(--primary-100); color: var(--primary-600); }
+  .sidebar-divider { height: 1px; background: var(--gray-100); margin: 8px 6px; }
+  .sidebar-cat-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .sidebar-add-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 10px; border-radius: var(--radius-md);
+    color: var(--gray-400); font-size: 13px;
+    transition: var(--transition); cursor: pointer;
+  }
+  .sidebar-add-btn:hover { color: var(--primary-600); background: var(--primary-50); }
+
+  /* Main Content */
+  .main-content {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    background: var(--gray-50);
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px; background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+  }
+  .toolbar-title { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .toolbar-count { color: var(--gray-400); font-size: 13px; margin-left: 4px; }
+  .toolbar-spacer { flex: 1; }
+  .btn-filter {
+    display: flex; align-items: center; gap: 4px;
+    height: 30px; padding: 0 10px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--gray-200); color: var(--gray-500);
+    font-size: 12px; transition: var(--transition);
+  }
+  .btn-filter:hover { border-color: var(--gray-300); color: var(--gray-700); }
+  .view-toggle {
+    display: flex; border: 1.5px solid var(--gray-200); border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .view-toggle button {
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    color: var(--gray-400); font-size: 14px; transition: var(--transition);
+  }
+  .view-toggle button:hover { background: var(--gray-100); color: var(--gray-600); }
+  .view-toggle button.active { background: var(--primary-50); color: var(--primary-600); }
+
+  /* Prompt Grid */
+  .prompt-grid {
+    flex: 1; overflow-y: auto;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    align-content: start;
+  }
+
+  /* PromptCard */
+  .prompt-card {
+    background: #fff; border-radius: var(--radius-lg);
+    border: 1.5px solid var(--gray-200);
+    padding: 14px 16px;
+    transition: var(--transition-md);
+    cursor: pointer; position: relative;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .prompt-card:hover {
+    border-color: var(--primary-300, #a5b4fc);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .card-header {
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .card-title {
+    flex: 1; font-size: 14px; font-weight: 600;
+    color: var(--gray-900); line-height: 1.4;
+  }
+  .card-pin { color: var(--primary-500); font-size: 13px; }
+  .card-fav { color: var(--gray-300); font-size: 15px; transition: var(--transition); }
+  .card-fav.active { color: #f59e0b; }
+  .card-fav:hover { color: #f59e0b; }
+  .card-more { color: var(--gray-300); font-size: 16px; }
+  .card-more:hover { color: var(--gray-600); }
+  .card-preview {
+    font-size: 12.5px; color: var(--gray-500); line-height: 1.6;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-footer {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    margin-top: 2px;
+  }
+  .tag {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px; border-radius: var(--radius-full);
+    font-size: 11px; font-weight: 500;
+  }
+  .tag-purple { background: #ede9fe; color: #7c3aed; }
+  .tag-blue   { background: #dbeafe; color: #1d4ed8; }
+  .tag-green  { background: #d1fae5; color: #065f46; }
+  .tag-orange { background: #ffedd5; color: #c2410c; }
+  .tag-pink   { background: #fce7f3; color: #9d174d; }
+  .card-footer-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .use-count { font-size: 11px; color: var(--gray-400); }
+  .btn-copy {
+    height: 26px; padding: 0 10px; border-radius: var(--radius-md);
+    background: var(--primary-600); color: #fff; font-size: 12px;
+    transition: var(--transition);
+  }
+  .btn-copy:hover { background: var(--primary-700); }
+
+  /* List View */
+  .prompt-list {
+    flex: 1; overflow-y: auto; padding: 8px 20px;
+  }
+  .list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; background: #fff;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-lg);
+    margin-bottom: 6px; cursor: pointer; transition: var(--transition);
+  }
+  .list-item:hover { border-color: var(--primary-300, #a5b4fc); box-shadow: var(--shadow-sm); }
+  .list-item-icon {
+    width: 34px; height: 34px; border-radius: var(--radius-md);
+    background: var(--primary-50); color: var(--primary-600);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .list-item-body { flex: 1; min-width: 0; }
+  .list-item-title { font-size: 13px; font-weight: 500; color: var(--gray-900); }
+  .list-item-preview {
+    font-size: 12px; color: var(--gray-400);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+  .list-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* ============================
+     ② Popup 界面
+  ============================ */
+  .popup-shell {
+    width: 360px; min-height: 480px; background: #fff;
+    border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);
+    overflow: hidden; margin: 20px auto;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--gray-200);
+  }
+  .popup-header {
+    padding: 12px 14px; background: var(--gray-900);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .popup-header .logo {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--primary-400), var(--primary-700));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #fff;
+  }
+  .popup-header-title { font-size: 13px; font-weight: 600; color: #fff; flex: 1; }
+  .popup-header-action { color: var(--gray-400); font-size: 16px; transition: var(--transition); }
+  .popup-header-action:hover { color: #fff; }
+  .popup-search {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .popup-search input {
+    flex: 1; border: none; background: none; outline: none;
+    font-size: 13px; color: var(--gray-800);
+  }
+  .popup-search input::placeholder { color: var(--gray-400); }
+  .popup-tabs {
+    display: flex; border-bottom: 1px solid var(--gray-200);
+    padding: 0 14px;
+  }
+  .popup-tab {
+    padding: 8px 10px; font-size: 12px; color: var(--gray-400);
+    border-bottom: 2px solid transparent; transition: var(--transition);
+    cursor: pointer;
+  }
+  .popup-tab.active { color: var(--primary-600); border-color: var(--primary-600); font-weight: 500; }
+  .popup-list { flex: 1; overflow-y: auto; max-height: 360px; }
+  .popup-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px; cursor: pointer; transition: var(--transition);
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .popup-item:hover { background: var(--primary-50); }
+  .popup-item-cat {
+    width: 6px; height: 6px; border-radius: 50%;
+    margin-top: 5px; flex-shrink: 0;
+  }
+  .popup-item-body { flex: 1; min-width: 0; }
+  .popup-item-title { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+  .popup-item-preview {
+    font-size: 11px; color: var(--gray-400);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+  .popup-item-copy {
+    color: var(--gray-300); font-size: 14px;
+    transition: var(--transition); flex-shrink: 0; padding: 2px;
+  }
+  .popup-item:hover .popup-item-copy { color: var(--primary-500); }
+  .popup-footer {
+    padding: 10px 14px; background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .popup-footer-link { font-size: 12px; color: var(--primary-600); }
+  .popup-footer-link:hover { text-decoration: underline; }
+
+  /* ============================
+     ③ 编辑器 Modal
+  ============================ */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .modal {
+    background: #fff; border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    width: 740px; max-height: 88vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px; border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 15px; font-weight: 600; color: var(--gray-900); flex: 1; }
+  .modal-close { color: var(--gray-400); font-size: 18px; transition: var(--transition); }
+  .modal-close:hover { color: var(--gray-700); }
+  .modal-body { display: flex; flex: 1; overflow: hidden; }
+  .modal-form {
+    width: 260px; flex-shrink: 0;
+    padding: 16px; border-right: 1px solid var(--gray-200);
+    overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 12px; font-weight: 500; color: var(--gray-600); }
+  .form-input {
+    height: 34px; padding: 0 10px;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-md);
+    font-size: 13px; color: var(--gray-800);
+    transition: var(--transition); outline: none; font-family: inherit;
+  }
+  .form-input:focus { border-color: var(--primary-400); box-shadow: var(--shadow-focus); }
+  .form-select {
+    height: 34px; padding: 0 10px;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-md);
+    font-size: 13px; color: var(--gray-800);
+    appearance: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+    outline: none; cursor: pointer; font-family: inherit;
+  }
+  .form-select:focus { border-color: var(--primary-400); box-shadow: var(--shadow-focus); }
+  .tags-input {
+    display: flex; flex-wrap: wrap; gap: 5px;
+    padding: 6px 8px; min-height: 36px;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-md);
+    cursor: text; transition: var(--transition);
+  }
+  .tags-input:focus-within { border-color: var(--primary-400); box-shadow: var(--shadow-focus); }
+  .tags-input .tag { cursor: default; }
+  .tag-close { margin-left: 3px; color: inherit; opacity: .6; }
+  .tags-input input { border: none; outline: none; font-size: 12px; min-width: 60px; flex: 1; font-family: inherit; }
+  .modal-editor {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .editor-tabs {
+    display: flex; border-bottom: 1px solid var(--gray-200); padding: 0 16px;
+    flex-shrink: 0;
+  }
+  .editor-tab {
+    padding: 8px 12px; font-size: 12px; color: var(--gray-400);
+    border-bottom: 2px solid transparent; transition: var(--transition); cursor: pointer;
+  }
+  .editor-tab.active { color: var(--primary-600); border-color: var(--primary-600); font-weight: 500; }
+  .editor-area {
+    flex: 1; padding: 16px;
+    font-family: var(--font-mono); font-size: 13px; color: var(--gray-800);
+    border: none; outline: none; resize: none; line-height: 1.7;
+    background: transparent;
+  }
+  .editor-area::placeholder { color: var(--gray-400); font-family: var(--font-sans); }
+  .modal-footer {
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    padding: 12px 20px; border-top: 1px solid var(--gray-200);
+    flex-shrink: 0; background: var(--gray-50);
+  }
+  .btn-ghost {
+    height: 34px; padding: 0 16px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--gray-200); color: var(--gray-600);
+    font-size: 13px; transition: var(--transition);
+  }
+  .btn-ghost:hover { border-color: var(--gray-300); background: var(--gray-50); }
+  .btn-save {
+    height: 34px; padding: 0 20px; border-radius: var(--radius-md);
+    background: var(--primary-600); color: #fff;
+    font-size: 13px; font-weight: 500; transition: var(--transition);
+  }
+  .btn-save:hover { background: var(--primary-700); }
+
+  /* ============================
+     ④ 导入导出页
+  ============================ */
+  .io-shell {
+    max-width: 780px; margin: 0 auto; padding: 28px 24px;
+  }
+  .io-title { font-size: 18px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+  .io-desc { font-size: 13px; color: var(--gray-500); margin-bottom: 24px; }
+  .io-section {
+    background: #fff; border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-xl); padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .io-section-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .io-section-icon {
+    width: 36px; height: 36px; border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .io-section-icon.export { background: #dbeafe; }
+  .io-section-icon.import { background: #d1fae5; }
+  .io-section-title { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+  .io-section-sub { font-size: 12px; color: var(--gray-400); }
+  .io-formats { display: flex; gap: 10px; flex-wrap: wrap; }
+  .io-format-card {
+    flex: 1; min-width: 160px;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-lg);
+    padding: 14px 16px; cursor: pointer; transition: var(--transition);
+  }
+  .io-format-card:hover { border-color: var(--primary-400); background: var(--primary-50); }
+  .io-format-badge {
+    display: inline-block; padding: 2px 8px; border-radius: var(--radius-full);
+    font-size: 11px; font-weight: 600; margin-bottom: 6px;
+  }
+  .badge-json { background: #fef3c7; color: #92400e; }
+  .badge-md   { background: #ede9fe; color: #6d28d9; }
+  .badge-csv  { background: #d1fae5; color: #065f46; }
+  .io-format-title { font-size: 13px; font-weight: 500; color: var(--gray-800); margin-bottom: 2px; }
+  .io-format-desc { font-size: 12px; color: var(--gray-400); }
+  .io-drop-zone {
+    border: 2px dashed var(--gray-300); border-radius: var(--radius-lg);
+    padding: 32px; text-align: center; cursor: pointer;
+    transition: var(--transition);
+  }
+  .io-drop-zone:hover { border-color: var(--primary-400); background: var(--primary-50); }
+  .io-drop-icon { font-size: 32px; margin-bottom: 8px; }
+  .io-drop-title { font-size: 14px; font-weight: 500; color: var(--gray-700); margin-bottom: 4px; }
+  .io-drop-sub { font-size: 12px; color: var(--gray-400); }
+  .io-conflict-row {
+    display: flex; align-items: center; gap: 8px; margin-top: 16px;
+  }
+  .io-conflict-label { font-size: 13px; color: var(--gray-600); }
+  .conflict-opt {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--gray-200); font-size: 12px;
+    color: var(--gray-500); cursor: pointer; transition: var(--transition);
+  }
+  .conflict-opt.selected { border-color: var(--primary-400); color: var(--primary-600); background: var(--primary-50); }
+
+  /* ============================
+     ⑤ 分类管理
+  ============================ */
+  .cat-shell { max-width: 680px; margin: 0 auto; padding: 28px 24px; }
+  .cat-header-row {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+  }
+  .cat-item {
+    display: flex; align-items: center; gap: 12px;
+    background: #fff; border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: 12px 16px;
+    margin-bottom: 8px; cursor: grab; transition: var(--transition);
+  }
+  .cat-item:hover { border-color: var(--gray-300); box-shadow: var(--shadow-sm); }
+  .cat-drag { color: var(--gray-300); font-size: 16px; }
+  .cat-color-dot {
+    width: 28px; height: 28px; border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .cat-name { flex: 1; font-size: 13px; font-weight: 500; color: var(--gray-800); }
+  .cat-count { font-size: 12px; color: var(--gray-400); margin-right: 4px; }
+  .cat-actions { display: flex; gap: 4px; }
+  .cat-action-btn { color: var(--gray-300); padding: 4px; transition: var(--transition); }
+  .cat-action-btn:hover { color: var(--gray-600); }
+
+  /* ============================
+     Toast 通知
+  ============================ */
+  .toast {
+    position: fixed; top: 60px; right: 20px; z-index: 9999;
+    background: var(--gray-900); color: #fff;
+    padding: 10px 16px; border-radius: var(--radius-lg);
+    font-size: 13px; display: flex; align-items: center; gap: 8px;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn .2s ease;
+  }
+  .toast-success { background: #065f46; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ============================
+     右键菜单
+  ============================ */
+  .ctx-menu {
+    position: fixed; z-index: 9998;
+    background: #fff; border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: 4px; min-width: 160px;
+    top: 320px; left: 480px;
+  }
+  .ctx-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; border-radius: var(--radius-md);
+    font-size: 13px; color: var(--gray-700); cursor: pointer;
+    transition: var(--transition);
+  }
+  .ctx-item:hover { background: var(--primary-50); color: var(--primary-700); }
+  .ctx-item.danger:hover { background: #fef2f2; color: var(--danger); }
+  .ctx-divider { height: 1px; background: var(--gray-100); margin: 4px 8px; }
+
+  /* ============================
+     空状态
+  ============================ */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 60px 24px; text-align: center;
+    color: var(--gray-400);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-title { font-size: 15px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+  .empty-desc { font-size: 13px; margin-bottom: 20px; }
+
+  /* Highlight search */
+  .highlight { background: #fef08a; color: var(--gray-900); border-radius: 2px; padding: 0 1px; }
+
+  /* Dark mode preview block */
+  .dark-preview {
+    background: var(--gray-900); color: #fff; padding: 20px;
+    border-radius: var(--radius-xl); margin: 20px;
+  }
+  .dark-preview .prompt-card {
+    background: var(--gray-800); border-color: var(--gray-700);
+  }
+  .dark-preview .card-title { color: #e5e7eb; }
+  .dark-preview .card-preview { color: var(--gray-400); }
+</style>
+</head>
+<body>
+
+<!-- 导航 -->
+<nav class="demo-nav">
+  <span>UI Preview</span>
+  <button class="active" onclick="showPage('options')">① Options 主界面</button>
+  <button onclick="showPage('popup')">② Popup 弹窗</button>
+  <button onclick="showPage('editor')">③ 编辑器</button>
+  <button onclick="showPage('io')">④ 导入/导出</button>
+  <button onclick="showPage('category')">⑤ 分类管理</button>
+  <button onclick="showPage('dark')">⑥ 暗色模式</button>
+</nav>
+
+<!-- ========================================
+     ① Options 主界面 - 卡片视图
+======================================== -->
+<div id="page-options" class="page active">
+  <div class="options-shell">
+    <!-- TopBar -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="logo">🔖</div>
+        Prompt Manager
+      </div>
+      <div class="topbar-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="搜索提示词..." value="文案">
+        <span class="kbd">⌘K</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-outline">📥 导入</button>
+        <button class="btn-outline">📤 导出</button>
+        <button class="btn-icon" title="设置">⚙️</button>
+      </div>
+    </header>
+
+    <div class="options-body">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-item active">
+          <span class="icon">📋</span> 全部
+          <span class="badge">42</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="icon">⭐</span> 收藏
+          <span class="badge">8</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="icon">🕐</span> 最近使用
+          <span class="badge">12</span>
+        </div>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-label">我的分类</div>
+
+        <div class="sidebar-item">
+          <span class="sidebar-cat-dot" style="background:#6366f1"></span>
+          ✍️ 写作润色
+          <span class="badge">11</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="sidebar-cat-dot" style="background:#10b981"></span>
+          💻 编程开发
+          <span class="badge">9</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="sidebar-cat-dot" style="background:#f59e0b"></span>
+          📊 数据分析
+          <span class="badge">6</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="sidebar-cat-dot" style="background:#ec4899"></span>
+          🎨 创意设计
+          <span class="badge">7</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="sidebar-cat-dot" style="background:#3b82f6"></span>
+          📧 邮件沟通
+          <span class="badge">5</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="sidebar-cat-dot" style="background:#14b8a6"></span>
+          🤖 角色扮演
+          <span class="badge">4</span>
+        </div>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-add-btn">
+          <span>＋</span> 新建分类
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="main-content">
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <span class="toolbar-title">全部提示词</span>
+          <span class="toolbar-count">42 个</span>
+          <div class="toolbar-spacer"></div>
+          <button class="btn-filter">排序 ↕</button>
+          <button class="btn-filter">筛选 ▾</button>
+          <div class="view-toggle">
+            <button class="active" title="卡片视图">⊞</button>
+            <button title="列表视图">☰</button>
+          </div>
+          <button class="btn-primary">＋ 新建</button>
+        </div>
+
+        <!-- Card Grid -->
+        <div class="prompt-grid">
+
+          <div class="prompt-card">
+            <div class="card-header">
+              <span class="card-pin">📌</span>
+              <span class="card-title"><span class="highlight">文案</span>润色专家</span>
+              <button class="card-fav active">⭐</button>
+              <button class="card-more">···</button>
+            </div>
+            <div class="card-preview">你是一位专业的中文<span class="highlight">文案</span>润色专家，请将以下文字润色成更流畅、专业、有感染力的表达，保留原意，提升文字质量...</div>
+            <div class="card-footer">
+              <span class="tag tag-purple">#写作</span>
+              <span class="tag tag-pink">#润色</span>
+              <div class="card-footer-right">
+                <span class="use-count">已用 23 次</span>
+                <button class="btn-copy">复制</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="card-header">
+              <span class="card-title">代码 Code Review</span>
+              <button class="card-fav">☆</button>
+              <button class="card-more">···</button>
+            </div>
+            <div class="card-preview">请对以下代码进行 Code Review，重点关注：1. 代码规范与可读性 2. 潜在 Bug 3. 性能问题 4. 安全漏洞...</div>
+            <div class="card-footer">
+              <span class="tag tag-green">#编程</span>
+              <span class="tag tag-blue">#review</span>
+              <div class="card-footer-right">
+                <span class="use-count">已用 18 次</span>
+                <button class="btn-copy">复制</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="card-header">
+              <span class="card-title">会议纪要整理</span>
+              <button class="card-fav active">⭐</button>
+              <button class="card-more">···</button>
+            </div>
+            <div class="card-preview">你是一位专业的会议记录员，请将以下会议内容整理成结构清晰的纪要，包含：会议主题、参与人、主要议题、决议事项、待办清单...</div>
+            <div class="card-footer">
+              <span class="tag tag-orange">#效率</span>
+              <span class="tag tag-blue">#会议</span>
+              <div class="card-footer-right">
+                <span class="use-count">已用 9 次</span>
+                <button class="btn-copy">复制</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="card-header">
+              <span class="card-title">SQL 查询优化</span>
+              <button class="card-fav">☆</button>
+              <button class="card-more">···</button>
+            </div>
+            <div class="card-preview">分析以下 SQL 查询语句，找出性能瓶颈，给出优化建议，并提供优化后的 SQL，重点考虑索引使用、查询计划...</div>
+            <div class="card-footer">
+              <span class="tag tag-green">#SQL</span>
+              <span class="tag tag-green">#数据库</span>
+              <div class="card-footer-right">
+                <span class="use-count">已用 7 次</span>
+                <button class="btn-copy">复制</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="card-header">
+              <span class="card-pin">📌</span>
+              <span class="card-title"><span class="highlight">文案</span>改写·口语化</span>
+              <button class="card-fav">☆</button>
+              <button class="card-more">···</button>
+            </div>
+            <div class="card-preview">将以下书面化或正式的<span class="highlight">文案</span>改写成更口语化、亲切自然的表达方式，适合社交媒体、短视频脚本使用...</div>
+            <div class="card-footer">
+              <span class="tag tag-purple">#写作</span>
+              <span class="tag tag-pink">#口语化</span>
+              <div class="card-footer-right">
+                <span class="use-count">已用 15 次</span>
+                <button class="btn-copy">复制</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="card-header">
+              <span class="card-title">PRD 文档撰写</span>
+              <button class="card-fav active">⭐</button>
+              <button class="card-more">···</button>
+            </div>
+            <div class="card-preview">你是一位资深产品经理，请根据以下需求描述，撰写一份完整的 PRD 文档，包括：背景与目标、用户故事、功能清单、非功能需求、验收标准...</div>
+            <div class="card-footer">
+              <span class="tag tag-blue">#产品</span>
+              <span class="tag tag-blue">#PRD</span>
+              <div class="card-footer-right">
+                <span class="use-count">已用 6 次</span>
+                <button class="btn-copy">复制</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 右键菜单（示意） -->
+  <div class="ctx-menu">
+    <div class="ctx-item">📋 复制全文</div>
+    <div class="ctx-item">✏️ 编辑</div>
+    <div class="ctx-item">📁 移动到分类 ▶</div>
+    <div class="ctx-item">⭐ 取消收藏</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item danger">🗑️ 删除</div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast toast-success">✓ 已复制到剪贴板</div>
+</div>
+
+
+<!-- ========================================
+     ② Popup 弹窗
+======================================== -->
+<div id="page-popup" class="page" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--gray-200)">
+  <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center">
+
+    <!-- Popup 主体 -->
+    <div class="popup-shell">
+      <div class="popup-header">
+        <div class="logo">🔖</div>
+        <span class="popup-header-title">Prompt Manager</span>
+        <button class="popup-header-action">⚙</button>
+        <button class="popup-header-action">↗</button>
+      </div>
+
+      <div class="popup-search">
+        <span style="color:var(--gray-400);font-size:14px">🔍</span>
+        <input type="text" placeholder="快速搜索..." autofocus>
+      </div>
+
+      <div class="popup-tabs">
+        <div class="popup-tab active">全部</div>
+        <div class="popup-tab">⭐ 收藏</div>
+        <div class="popup-tab">🕐 最近</div>
+      </div>
+
+      <div class="popup-list">
+        <div class="popup-item">
+          <div class="popup-item-cat" style="background:#6366f1"></div>
+          <div class="popup-item-body">
+            <div class="popup-item-title">📌 文案润色专家</div>
+            <div class="popup-item-preview">你是一位专业的中文文案润色专家，请将以下...</div>
+          </div>
+          <button class="popup-item-copy">⧉</button>
+        </div>
+        <div class="popup-item">
+          <div class="popup-item-cat" style="background:#10b981"></div>
+          <div class="popup-item-body">
+            <div class="popup-item-title">代码 Code Review</div>
+            <div class="popup-item-preview">请对以下代码进行 Code Review，重点关注...</div>
+          </div>
+          <button class="popup-item-copy">⧉</button>
+        </div>
+        <div class="popup-item">
+          <div class="popup-item-cat" style="background:#f59e0b"></div>
+          <div class="popup-item-body">
+            <div class="popup-item-title">⭐ 会议纪要整理</div>
+            <div class="popup-item-preview">请将以下会议内容整理成结构清晰的纪要...</div>
+          </div>
+          <button class="popup-item-copy">⧉</button>
+        </div>
+        <div class="popup-item">
+          <div class="popup-item-cat" style="background:#6366f1"></div>
+          <div class="popup-item-body">
+            <div class="popup-item-title">文案改写·口语化</div>
+            <div class="popup-item-preview">将以下书面化内容改写成更口语化表达...</div>
+          </div>
+          <button class="popup-item-copy">⧉</button>
+        </div>
+        <div class="popup-item">
+          <div class="popup-item-cat" style="background:#3b82f6"></div>
+          <div class="popup-item-body">
+            <div class="popup-item-title">⭐ PRD 文档撰写</div>
+            <div class="popup-item-preview">你是一位资深产品经理，请根据以下需求...</div>
+          </div>
+          <button class="popup-item-copy">⧉</button>
+        </div>
+        <div class="popup-item">
+          <div class="popup-item-cat" style="background:#10b981"></div>
+          <div class="popup-item-body">
+            <div class="popup-item-title">SQL 查询优化</div>
+            <div class="popup-item-preview">分析以下 SQL，找出性能瓶颈，给出优化...</div>
+          </div>
+          <button class="popup-item-copy">⧉</button>
+        </div>
+        <div class="popup-item">
+          <div class="popup-item-cat" style="background:#ec4899"></div>
+          <div class="popup-item-body">
+            <div class="popup-item-title">品牌 Slogan 生成</div>
+            <div class="popup-item-preview">请为以下品牌生成 5 个朗朗上口的 Slogan...</div>
+          </div>
+          <button class="popup-item-copy">⧉</button>
+        </div>
+      </div>
+
+      <div class="popup-footer">
+        <span class="popup-footer-link">✚ 新建提示词</span>
+        <span class="popup-footer-link">打开管理页 →</span>
+      </div>
+    </div>
+
+    <!-- 说明 -->
+    <div style="max-width:240px;color:var(--gray-600);font-size:13px;line-height:1.8;background:#fff;padding:16px;border-radius:12px;border:1px solid var(--gray-200)">
+      <strong style="color:var(--gray-900);display:block;margin-bottom:8px">Popup 设计说明</strong>
+      📐 宽度：360px 固定<br>
+      📏 最大高度：560px<br>
+      🎯 聚焦：快速搜索 + 一键复制<br>
+      🔗 跳转：打开管理页<br>
+      💡 三个 Tab：全部 / 收藏 / 最近使用
+    </div>
+  </div>
+</div>
+
+
+<!-- ========================================
+     ③ 编辑器
+======================================== -->
+<div id="page-editor" class="page" style="min-height:100vh;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:18px">✏️</span>
+      <span class="modal-title">新建提示词</span>
+      <button class="modal-close">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- 左侧表单 -->
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">标题 *</label>
+          <input class="form-input" type="text" placeholder="给这个提示词取个名字" value="文案润色专家">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">分类</label>
+          <select class="form-select">
+            <option>✍️ 写作润色</option>
+            <option>💻 编程开发</option>
+            <option>📊 数据分析</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">标签</label>
+          <div class="tags-input">
+            <span class="tag tag-purple">写作 <button class="tag-close">×</button></span>
+            <span class="tag tag-pink">润色 <button class="tag-close">×</button></span>
+            <input type="text" placeholder="输入标签 Enter 添加">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
+            选项
+            <div style="display:flex;gap:12px">
+              <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer">
+                <input type="checkbox" checked> 置顶
+              </label>
+              <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer">
+                <input type="checkbox"> 收藏
+              </label>
+            </div>
+          </label>
+        </div>
+
+        <div style="font-size:12px;color:var(--gray-400);border-top:1px solid var(--gray-100);padding-top:12px">
+          <div>📅 创建：2026-04-23</div>
+          <div style="margin-top:3px">🔄 更新：刚刚</div>
+          <div style="margin-top:3px">📋 使用：23 次</div>
+        </div>
+      </div>
+
+      <!-- 右侧编辑区 -->
+      <div class="modal-editor">
+        <div class="editor-tabs">
+          <div class="editor-tab active">✏️ 编辑</div>
+          <div class="editor-tab">👁 预览</div>
+        </div>
+        <textarea class="editor-area" placeholder="输入提示词内容，支持 Markdown 格式...">你是一位专业的中文文案润色专家。
+
+请将以下文字润色成更流畅、专业、有感染力的表达：
+- 保留原文核心意思
+- 提升语言的精准度和优雅感
+- 适当增加细节描写
+- 语气风格：{{风格：专业/亲切/幽默}}
+
+原文：
+{{待润色文字}}</textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <span style="font-size:12px;color:var(--gray-400);margin-right:auto">💡 支持 {{变量名}} 模板语法</span>
+      <button class="btn-ghost">取消</button>
+      <button class="btn-save">保存</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========================================
+     ④ 导入/导出
+======================================== -->
+<div id="page-io" class="page">
+  <div class="io-shell">
+    <div class="io-title">导入 / 导出</div>
+    <div class="io-desc">备份你的提示词数据，或从其他设备导入</div>
+
+    <!-- 导出 -->
+    <div class="io-section">
+      <div class="io-section-header">
+        <div class="io-section-icon export">📤</div>
+        <div>
+          <div class="io-section-title">导出数据</div>
+          <div class="io-section-sub">将当前所有提示词导出为文件</div>
+        </div>
+      </div>
+
+      <div class="io-formats">
+        <div class="io-format-card">
+          <div class="io-format-badge badge-json">JSON</div>
+          <div class="io-format-title">完整备份</div>
+          <div class="io-format-desc">包含分类、标签、元数据，可完整恢复</div>
+        </div>
+        <div class="io-format-card">
+          <div class="io-format-badge badge-md">Markdown</div>
+          <div class="io-format-title">阅读友好</div>
+          <div class="io-format-desc">按分类整理，可直接阅读分享</div>
+        </div>
+        <div class="io-format-card">
+          <div class="io-format-badge badge-csv">CSV</div>
+          <div class="io-format-title">表格格式</div>
+          <div class="io-format-desc">适合 Excel / 表格软件处理</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px">
+        <span style="font-size:13px;color:var(--gray-600)">导出范围：</span>
+        <select class="form-select" style="width:auto">
+          <option>全部提示词（42 个）</option>
+          <option>当前分类</option>
+          <option>已收藏</option>
+        </select>
+        <button class="btn-primary" style="margin-left:auto">📥 立即导出</button>
+      </div>
+    </div>
+
+    <!-- 导入 -->
+    <div class="io-section">
+      <div class="io-section-header">
+        <div class="io-section-icon import">📥</div>
+        <div>
+          <div class="io-section-title">导入数据</div>
+          <div class="io-section-sub">从备份文件恢复，支持 JSON 格式</div>
+        </div>
+      </div>
+
+      <div class="io-drop-zone">
+        <div class="io-drop-icon">📂</div>
+        <div class="io-drop-title">拖拽文件到此处，或点击选择</div>
+        <div class="io-drop-sub">支持 .json 格式 · 最大 50MB</div>
+      </div>
+
+      <div class="io-conflict-row">
+        <span class="io-conflict-label">遇到重复数据时：</span>
+        <div class="conflict-opt">⏭ 跳过</div>
+        <div class="conflict-opt selected">🔀 合并</div>
+        <div class="conflict-opt">🔄 替换</div>
+      </div>
+    </div>
+
+    <!-- 危险区 -->
+    <div class="io-section" style="border-color:#fca5a5">
+      <div class="io-section-header">
+        <div class="io-section-icon" style="background:#fef2f2">⚠️</div>
+        <div>
+          <div class="io-section-title" style="color:var(--danger)">清空所有数据</div>
+          <div class="io-section-sub">删除全部提示词和分类，此操作不可恢复</div>
+        </div>
+        <button style="margin-left:auto;height:32px;padding:0 14px;border-radius:8px;border:1.5px solid #fca5a5;color:var(--danger);font-size:13px;background:#fff">清空数据</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========================================
+     ⑤ 分类管理
+======================================== -->
+<div id="page-category" class="page">
+  <div class="cat-shell">
+    <div class="cat-header-row">
+      <div>
+        <div class="io-title">分类管理</div>
+        <div class="io-desc">拖拽调整顺序，点击编辑分类信息</div>
+      </div>
+      <button class="btn-primary">＋ 新建分类</button>
+    </div>
+
+    <!-- 内置分类（只读） -->
+    <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px;padding-left:4px">内置分类（不可删除）</div>
+    <div class="cat-item" style="opacity:.6;cursor:default">
+      <span style="color:transparent;font-size:16px">⠿</span>
+      <div class="cat-color-dot" style="background:var(--gray-200)">📋</div>
+      <span class="cat-name">全部</span>
+      <span class="cat-count">42 个</span>
+      <span style="font-size:11px;color:var(--gray-300);padding:2px 8px;border:1px solid var(--gray-200);border-radius:4px">内置</span>
+    </div>
+    <div class="cat-item" style="opacity:.6;cursor:default">
+      <span style="color:transparent;font-size:16px">⠿</span>
+      <div class="cat-color-dot" style="background:#fef3c7">⭐</div>
+      <span class="cat-name">收藏</span>
+      <span class="cat-count">8 个</span>
+      <span style="font-size:11px;color:var(--gray-300);padding:2px 8px;border:1px solid var(--gray-200);border-radius:4px">内置</span>
+    </div>
+
+    <!-- 用户自定义分类 -->
+    <div style="font-size:12px;color:var(--gray-400);margin:16px 0 8px;padding-left:4px">自定义分类（可拖拽排序）</div>
+
+    <div class="cat-item">
+      <span class="cat-drag">⠿</span>
+      <div class="cat-color-dot" style="background:#ede9fe">✍️</div>
+      <span class="cat-name">写作润色</span>
+      <span class="cat-count">11 个</span>
+      <div class="cat-actions">
+        <button class="cat-action-btn">✏️</button>
+        <button class="cat-action-btn" style="color:#fca5a5">🗑️</button>
+      </div>
+    </div>
+
+    <div class="cat-item">
+      <span class="cat-drag">⠿</span>
+      <div class="cat-color-dot" style="background:#d1fae5">💻</div>
+      <span class="cat-name">编程开发</span>
+      <span class="cat-count">9 个</span>
+      <div class="cat-actions">
+        <button class="cat-action-btn">✏️</button>
+        <button class="cat-action-btn" style="color:#fca5a5">🗑️</button>
+      </div>
+    </div>
+
+    <div class="cat-item">
+      <span class="cat-drag">⠿</span>
+      <div class="cat-color-dot" style="background:#fef3c7">📊</div>
+      <span class="cat-name">数据分析</span>
+      <span class="cat-count">6 个</span>
+      <div class="cat-actions">
+        <button class="cat-action-btn">✏️</button>
+        <button class="cat-action-btn" style="color:#fca5a5">🗑️</button>
+      </div>
+    </div>
+
+    <div class="cat-item">
+      <span class="cat-drag">⠿</span>
+      <div class="cat-color-dot" style="background:#fce7f3">🎨</div>
+      <span class="cat-name">创意设计</span>
+      <span class="cat-count">7 个</span>
+      <div class="cat-actions">
+        <button class="cat-action-btn">✏️</button>
+        <button class="cat-action-btn" style="color:#fca5a5">🗑️</button>
+      </div>
+    </div>
+
+    <!-- 新建分类表单 -->
+    <div style="background:#fff;border:1.5px dashed var(--primary-300, #a5b4fc);border-radius:12px;padding:16px 20px;margin-top:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:12px">新建分类</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div class="form-group" style="flex:1;min-width:140px">
+          <label class="form-label">分类名称</label>
+          <input class="form-input" placeholder="如：营销推广">
+        </div>
+        <div class="form-group">
+          <label class="form-label">图标</label>
+          <input class="form-input" style="width:60px;text-align:center" value="📧">
+        </div>
+        <div class="form-group">
+          <label class="form-label">颜色</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+            <div style="width:22px;height:22px;border-radius:50%;background:#6366f1;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 2px #6366f1"></div>
+            <div style="width:22px;height:22px;border-radius:50%;background:#10b981;cursor:pointer"></div>
+            <div style="width:22px;height:22px;border-radius:50%;background:#f59e0b;cursor:pointer"></div>
+            <div style="width:22px;height:22px;border-radius:50%;background:#ec4899;cursor:pointer"></div>
+            <div style="width:22px;height:22px;border-radius:50%;background:#3b82f6;cursor:pointer"></div>
+            <div style="width:22px;height:22px;border-radius:50%;background:#14b8a6;cursor:pointer"></div>
+          </div>
+        </div>
+        <button class="btn-primary" style="height:34px">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========================================
+     ⑥ 暗色模式预览
+======================================== -->
+<div id="page-dark" class="page" style="background:var(--gray-900);min-height:100vh">
+
+  <!-- Dark TopBar -->
+  <div style="background:var(--gray-800);border-bottom:1px solid var(--gray-700);height:56px;display:flex;align-items:center;gap:12px;padding:0 20px">
+    <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;color:#f9fafb">
+      <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--primary-400),var(--primary-700));display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff">🔖</div>
+      Prompt Manager
+    </div>
+    <div style="flex:1;max-width:480px;display:flex;align-items:center;gap:8px;background:var(--gray-700);border:1.5px solid var(--gray-600);border-radius:12px;padding:0 12px;height:36px">
+      <span style="color:var(--gray-400)">🔍</span>
+      <input type="text" placeholder="搜索提示词..." style="flex:1;border:none;background:none;outline:none;font-size:13px;color:#e5e7eb;font-family:inherit">
+      <span style="background:var(--gray-600);border-radius:4px;padding:1px 5px;font-size:11px;color:var(--gray-400);font-family:monospace">⌘K</span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <button style="height:32px;padding:0 12px;border-radius:8px;border:1.5px solid var(--gray-600);color:var(--gray-300);font-size:13px;background:none">📥 导入</button>
+      <button style="height:32px;padding:0 12px;border-radius:8px;border:1.5px solid var(--gray-600);color:var(--gray-300);font-size:13px;background:none">📤 导出</button>
+    </div>
+  </div>
+
+  <!-- Dark Body -->
+  <div style="display:flex;height:calc(100vh - 96px)">
+    <!-- Dark Sidebar -->
+    <div style="width:220px;background:var(--gray-800);border-right:1px solid var(--gray-700);padding:12px 8px;overflow-y:auto">
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:rgba(99,102,241,.2);color:#a5b4fc;font-size:13px;font-weight:500">
+        <span>📋</span> 全部 <span style="margin-left:auto;background:rgba(99,102,241,.3);color:#a5b4fc;border-radius:9999px;padding:1px 6px;font-size:11px">42</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:var(--gray-400);font-size:13px;margin-top:2px">
+        <span>⭐</span> 收藏 <span style="margin-left:auto;background:var(--gray-700);color:var(--gray-500);border-radius:9999px;padding:1px 6px;font-size:11px">8</span>
+      </div>
+      <div style="height:1px;background:var(--gray-700);margin:8px 6px"></div>
+      <div style="padding:4px 10px;font-size:11px;font-weight:600;color:var(--gray-600);letter-spacing:.06em;text-transform:uppercase">我的分类</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:var(--gray-400);font-size:13px;margin-top:2px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#6366f1"></div>
+        ✍️ 写作润色
+        <span style="margin-left:auto;background:var(--gray-700);color:var(--gray-500);border-radius:9999px;padding:1px 6px;font-size:11px">11</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:var(--gray-400);font-size:13px;margin-top:2px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#10b981"></div>
+        💻 编程开发
+        <span style="margin-left:auto;background:var(--gray-700);color:var(--gray-500);border-radius:9999px;padding:1px 6px;font-size:11px">9</span>
+      </div>
+    </div>
+
+    <!-- Dark Main -->
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--gray-800);border-bottom:1px solid var(--gray-700)">
+        <span style="font-size:15px;font-weight:600;color:#f9fafb">全部提示词</span>
+        <span style="color:var(--gray-500);font-size:13px">42 个</span>
+        <div style="flex:1"></div>
+        <button style="height:32px;padding:0 12px;border-radius:8px;background:var(--primary-600);color:#fff;font-size:13px;font-weight:500">＋ 新建</button>
+      </div>
+
+      <div style="padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;overflow-y:auto">
+
+        <div style="background:var(--gray-800);border:1.5px solid var(--gray-700);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <span style="color:var(--primary-400);font-size:13px">📌</span>
+            <span style="flex:1;font-size:14px;font-weight:600;color:#f3f4f6">文案润色专家</span>
+            <span style="color:#f59e0b;font-size:15px">⭐</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--gray-500);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">你是一位专业的中文文案润色专家，请将以下文字润色成更流畅、专业、有感染力的表达...</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="background:rgba(139,92,246,.2);color:#a78bfa;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:500">#写作</span>
+            <span style="background:rgba(236,72,153,.2);color:#f9a8d4;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:500">#润色</span>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:var(--gray-600)">23次</span>
+              <button style="height:26px;padding:0 10px;border-radius:8px;background:var(--primary-700);color:#fff;font-size:12px">复制</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--gray-800);border:1.5px solid var(--gray-700);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <span style="flex:1;font-size:14px;font-weight:600;color:#f3f4f6">代码 Code Review</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--gray-500);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">请对以下代码进行 Code Review，重点关注代码规范、潜在 Bug、性能问题和安全漏洞...</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="background:rgba(16,185,129,.2);color:#6ee7b7;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:500">#编程</span>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:var(--gray-600)">18次</span>
+              <button style="height:26px;padding:0 10px;border-radius:8px;background:var(--primary-700);color:#fff;font-size:12px">复制</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--gray-800);border:1.5px solid var(--gray-700);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <span style="flex:1;font-size:14px;font-weight:600;color:#f3f4f6">会议纪要整理</span>
+            <span style="color:#f59e0b;font-size:15px">⭐</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--gray-500);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">请将以下会议内容整理成结构清晰的纪要，包含：会议主题、参与人、议题、决议、待办...</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="background:rgba(245,158,11,.2);color:#fcd34d;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:500">#效率</span>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:var(--gray-600)">9次</span>
+              <button style="height:26px;padding:0 10px;border-radius:8px;background:var(--primary-700);color:#fff;font-size:12px">复制</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Dark Toast -->
+  <div style="position:fixed;bottom:20px;right:20px;background:var(--gray-700);color:#f9fafb;padding:10px 16px;border-radius:12px;font-size:13px;display:flex;align-items:center;gap:8px;border:1px solid var(--gray-600);box-shadow:0 8px 24px rgba(0,0,0,.4)">
+    ✓ 已复制到剪贴板
+  </div>
+</div>
+
+
+<script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).style.display = 'block';
+  event.target.classList.add('active');
+}
+// 初始化
+document.getElementById('page-options').style.display = 'block';
+</script>
+</body>
+</html>

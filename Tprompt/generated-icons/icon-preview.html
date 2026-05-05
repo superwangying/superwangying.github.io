@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Prompt Manager · Icon 设计方案对比</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-deep: #4338ca;
+    --violet: #8b5cf6;
+    --cyan: #06b6d4;
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --text: #e4e4e9;
+    --text2: #9898a6;
+    --border: #2e3244;
+    --radius: 16px;
+    --glow: rgba(99,102,241,.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  /* ===== Header ===== */
+  .header { text-align: center; margin-bottom: 56px; }
+  .header h1 {
+    font-size: 32px; font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--violet), #ec4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 12px; letter-spacing: -0.5px;
+  }
+  .header p { color: var(--text2); font-size: 15px; }
+  .header .badge {
+    display: inline-block; padding: 4px 14px; border-radius: 20px;
+    background: var(--surface2); color: var(--primary); font-size: 12px; font-weight: 600;
+    margin-top: 14px; border: 1px solid var(--border);
+  }
+
+  /* ===== Grid ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    max-width: 1280px; margin: 0 auto;
+  }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; max-width: 480px; } }
+
+  /* ===== Card ===== */
+  .card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); overflow: hidden;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,.35), 0 0 60px var(--glow);
+  }
+
+  .card-label {
+    display: flex; align-items: center; gap: 10px;
+    padding: 18px 22px; border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(99,102,241,.06), transparent);
+  }
+  .card-label .tag {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  .tag-a { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; }
+  .tag-b { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: #fff; }
+  .tag-c { background: linear-gradient(135deg, #06b6d4, #22d3ee); color: #fff; }
+
+  .card-label h3 { font-size: 17px; font-weight: 600; flex: 1; }
+  .card-label span { font-size: 11px; color: var(--text2); background: var(--surface2); padding: 3px 10px; border-radius: 10px; }
+
+  .card-body { padding: 32px 22px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+  /* ===== Main Icon Display ===== */
+  .icon-showcase {
+    width: 160px; height: 160px; border-radius: 28px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .icon-showcase svg { width: 96px; height: 96px; }
+  .showcase-a { background: linear-gradient(145deg, #f0f4ff, #e0e7ff); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 8px 32px rgba(99,102,241,.18); }
+  .showcase-b { background: linear-gradient(145deg, #ede9fe, #ddd6fe); box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 8px 32px rgba(139,92,246,.22); }
+  .showcase-c { background: linear-gradient(145deg, #1a1d27, #12141c); box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 8px 40px rgba(6,182,212,.15); border: 1px solid rgba(6,182,212,.15); }
+
+  /* ===== Size Preview ===== */
+  .sizes { display: flex; gap: 28px; align-items: flex-end; justify-content: center; width: 100%; padding: 18px 0; border-top: 1px solid var(--border); }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .size-item .label { font-size: 10px; color: var(--text2); font-weight: 500; letter-spacing: .5px; text-transform: uppercase; }
+  .size-box {
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; border: 1px dashed var(--border);
+  }
+  .size-box svg { display: block; }
+  .s16 { width: 32px; height: 32px; }  .s16 svg { width: 16px; height: 16px; }
+  .s48 { width: 56px; height: 56px; border-radius: 10px; }  .s48 svg { width: 36px; height: 36px; }
+  .s128 { width: 96px; height: 96px; border-radius: 14px; }  .s128 svg { width: 64px; height: 64px; }
+
+  /* Chrome toolbar mock */
+  .chrome-mock {
+    display: flex; align-items: center; gap: 8px;
+    background: #27272a; border-radius: 8px; padding: 8px 12px 8px 10px;
+    border: 1px solid #3f3f46; width: 100%;
+  }
+  .chrome-mock::before {
+    content: ''; width: 16px; height: 16px; flex-shrink: 0;
+    border-radius: 50%; background: #3f3f46;
+  }
+  .chrome-mock svg.icon-chrome { width: 16px !important; height: 16px !important; flex-shrink: 0; }
+  .chrome-mock .bar-text { font-size: 11px; color: #a1a1aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* ===== Feature Tags ===== */
+  .features { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; width: 100%; }
+  .features span {
+    font-size: 11px; padding: 4px 10px; border-radius: 6px;
+    background: var(--surface2); color: var(--text2);
+    border: 1px solid var(--border);
+  }
+
+  /* ===== Footer ===== */
+  .footer { text-align: center; margin-top: 56px; color: var(--text2); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✦ Prompt Manager Icon</h1>
+  <p>Chrome 扩展图标设计方案 · 3 版风格对比</p>
+  <span class="badge">Prompt Manager Plugin v1.0</span>
+</div>
+
+<div class="grid">
+
+<!-- ==================== 方案 A：极简线性 ==================== -->
+<div class="card">
+  <div class="card-label">
+    <div class="tag tag-a">A</div>
+    <h3>极简线性 Minimalist Line</h3>
+    <span>推荐 · 轻量清晰</span>
+  </div>
+  <div class="card-body">
+    <div class="icon-showcase showcase-a">
+      <!-- SVG A: 极简线性 - 文档 + AI闪烁 -->
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 圆角矩形底板 -->
+        <rect x="16" y="12" width="52" height="72" rx="6" stroke="#4f46e5" stroke-width="2.5" fill="none"/>
+        <!-- 折角 -->
+        <path d="M54 12 L68 26 L68 18 Q68 12 62 12 Z" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2" stroke-linejoin="round"/>
+        <!-- 文字行 -->
+        <line x1="25" y1="34" x2="59" y2="34" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="25" y1="44" x2="52" y2="44" stroke="#c7d7fe" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="25" y1="54" x2="56" y2="54" stroke="#c7d7fe" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="25" y1="64" x2="45" y2="64" stroke="#c7d7fe" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- AI 星芒 -->
+        <g transform="translate(66, 58)">
+          <circle cx="10" cy="10" r="10" fill="#6366f1"/>
+          <path d="M10 5 L11 9 L15 10 L11 11 L10 15 L9 11 L5 10 L9 9 Z" fill="white"/>
+          <!-- 光晕射线 -->
+          <line x1="10" y1="-2" x2="10" y2="1" stroke="#818cf8" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="22" y1="10" x2="19" y2="10" stroke="#818cf8" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="18.5" y1="1.5" x2="16.4" y2="3.6" stroke="#818cf8" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="18.5" y1="18.5" x2="16.4" y2="16.4" stroke="#818cf8" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="features">
+      <span>✓ 2px 等宽线条</span><span>✓ 单色 Indigo</span>
+      <span>✓ 小尺寸清晰</span><span>✓ 无渐变无阴影</span>
+    </div>
+
+    <div class="sizes">
+      <div class="size-item s16">
+        <div class="size-box" style="background:#f0f4ff;">
+          <svg viewBox="0 0 96 96" fill="none"><rect x="16" y="12" width="52" height="72" rx="6" stroke="#4f46e5" stroke-width="2.5"/><path d="M54 12L68 26V18Q68 12 62 12Z" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><line x1="25" y1="34" x2="59" y2="34" stroke="#818cf8" stroke-width="2.5"/><line x1="25" y1="44" x2="52" y2="44" stroke="#c7d7fe" stroke-width="2.5"/><line x1="25" y1="54" x2="56" y2="54" stroke="#c7d7fe" stroke-width="2.5"/><circle cx="76" cy="68" r="10" fill="#6366f1"/><path d="M76 63l1 4 4 1-4 1-1 4-1-4-4-1 4-1z" fill="white"/></svg>
+        </div>
+        <span class="label">16px</span>
+      </div>
+      <div class="size-item s48">
+        <div class="size-box" style="background:#f0f4ff;">
+          <svg viewBox="0 0 96 96" fill="none"><rect x="16" y="12" width="52" height="72" rx="6" stroke="#4f46e5" stroke-width="2.5"/><path d="M54 12L68 26V18Q68 12 62 12Z" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><line x1="25" y1="34" x2="59" y2="34" stroke="#818cf8" stroke-width="2.5"/><line x1="25" y1="44" x2="52" y2="44" stroke="#c7d7fe" stroke-width="2.5"/><line x1="25" y1="54" x2="56" y2="54" stroke="#c7d7fe" stroke-width="2.5"/><circle cx="76" cy="68" r="10" fill="#6366f1"/><path d="M76 63l1 4 4 1-4 1-1 4-1-4-4-1 4-1z" fill="white"/></svg>
+        </div>
+        <span class="label">48px</span>
+      </div>
+      <div class="size-item s128">
+        <div class="size-box" style="background:#f0f4ff;">
+          <svg viewBox="0 0 96 96" fill="none"><rect x="16" y="12" width="52" height="72" rx="6" stroke="#4f46e5" stroke-width="2.5"/><path d="M54 12L68 26V18Q68 12 62 12Z" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><line x1="25" y1="34" x2="59" y2="34" stroke="#818cf8" stroke-width="2.5"/><line x1="25" y1="44" x2="52" y2="44" stroke="#c7d7fe" stroke-width="2.5"/><line x1="25" y1="54" x2="56" y2="54" stroke="#c7d7fe" stroke-width="2.5"/><circle cx="76" cy="68" r="10" fill="#6366f1"/><path d="M76 63l1 4 4 1-4 1-1 4-1-4-4-1 4-1z" fill="white"/></svg>
+        </div>
+        <span class="label">128px</span>
+      </div>
+    </div>
+
+    <div class="chrome-mock">
+      <svg class="icon-chrome" viewBox="0 0 96 96" fill="none"><rect x="16" y="12" width="52" height="72" rx="6" stroke="#4f46e5" stroke-width="2.5"/><path d="M54 12L68 26V18Q68 12 62 12Z" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><line x1="25" y1="34" x2="59" y2="34" stroke="#818cf8" stroke-width="2.5"/><line x1="25" y1="44" x2="52" y2="44" stroke="#c7d7fe" stroke-width="2.5"/><circle cx="76" cy="68" r="10" fill="#6366f1"/><path d="M76 63l1 4 4 1-4 1-1 4-1-4-4-1 4-1z" fill="white"/></svg>
+      <span class="bar-text">Prompt Manager</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 方案 B：渐变立体 ==================== -->
+<div class="card">
+  <div class="card-label">
+    <div class="tag tag-b">B</div>
+    <h3>渐变立体 Gradient 3D</h3>
+    <span>精致 · 品牌感强</span>
+  </div>
+  <div class="card-body">
+    <div class="icon-showcase showcase-b">
+      <!-- SVG B: 渐变立体 - 文档 + 神经网络节点 -->
+      <defs>
+        <linearGradient id="gradB-main" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#6366f1"/>
+          <stop offset="100%" stop-color="#8b5cf6"/>
+        </linearGradient>
+        <linearGradient id="gradB-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#a78bfa"/>
+          <stop offset="100%" stop-color="#c084fc"/>
+        </linearGradient>
+        <filter id="shadowB" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#6366f1" flood-opacity=".25"/>
+        </filter>
+        <filter id="glowB" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" filter="url(#shadowB)">
+        <!-- 底层光晕 -->
+        <rect x="14" y="10" width="60" height="76" rx="10" fill="url(#gradB-main)" opacity=".12"/>
+        <!-- 圆角文档主体 -->
+        <rect x="18" y="14" width="48" height="68" rx="8" fill="white" opacity=".95"/>
+        <rect x="18" y="14" width="48" height="68" rx="8" stroke="url(#gradB-main)" stroke-width="2.5"/>
+        <!-- 折角 -->
+        <path d="M50 14 L66 30 L66 22 Q66 14 58 14 Z" fill="url(#gradB-main)" opacity=".85"/>
+        <!-- 文字行（渐变） -->
+        <rect x="26" y="33" width="30" height="3.5" rx="1.75" fill="url(#gradB-main)" opacity=".7"/>
+        <rect x="26" y="43" width="22" height="3.5" rx="1.75" fill="url(#gradB-glow)" opacity=".4"/>
+        <rect x="26" y="53" width="26" height="3.5" rx="1.75" fill="url(#gradB-glow)" opacity=".3"/>
+        <rect x="26" y="63" width="16" height="3.5" rx="1.75" fill="url(#gradB-glow)" opacity=".25"/>
+        <!-- 神经网络连接线 -->
+        <g opacity=".5" stroke="#8b5cf6" stroke-width="1.2">
+          <line x1="62" y1="42" x2="74" y2="34" stroke-dasharray="3 2"/>
+          <line x1="62" y1="54" x2="78" y2="54" stroke-dasharray="3 2"/>
+          <line x1="62" y1="66" x2="74" y2="74" stroke-dasharray="3 2"/>
+        </g>
+        <!-- AI 节点 -->
+        <g filter="url(#glowB)">
+          <circle cx="77" cy="32" r="5" fill="#8b5cf6"/>
+          <circle cx="81" cy="54" r="5" fill="#a78bfa"/>
+          <circle cx="77" cy="76" r="5" fill="#8b5cf6"/>
+          <!-- 中心主节点 -->
+          <circle cx="70" cy="54" r="8" fill="url(#gradB-main)"/>
+          <circle cx="70" cy="54" r="3" fill="white"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="features">
+      <span>✓ Indigo→Violet 渐变</span><span>✓ 柔和投影</span>
+      <span>✓ 内发光效果</span><span>✓ SaaS 级质感</span>
+    </div>
+
+    <div class="sizes">
+      <div class="size-item s16">
+        <div class="size-box" style="background:#ede9fe;">
+          <svg viewBox="0 0 96 96" fill="none"><defs><linearGradient id="gb1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect x="18" y="14" width="48" height="68" rx="8" fill="#fff" stroke="url(#gb1)" stroke-width="2.5"/><path d="M50 14L66 30V22Q66 14 58 14Z" fill="url(#gb1)"/><rect x="26" y="33" width="30" height="3.5" rx="1.75" fill="url(#gb1)" opacity=".7"/><circle cx="70" cy="54" r="8" fill="url(#gb1)"/><circle cx="70" cy="54" r="3" fill="#fff"/></svg>
+        </div>
+        <span class="label">16px</span>
+      </div>
+      <div class="size-item s48">
+        <div class="size-box" style="background:#ede9fe;">
+          <svg viewBox="0 0 96 96" fill="none"><defs><linearGradient id="gb2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect x="18" y="14" width="48" height="68" rx="8" fill="#fff" stroke="url(#gb2)" stroke-width="2.5"/><path d="M50 14L66 30V22Q66 14 58 14Z" fill="url(#gb2)"/><rect x="26" y="33" width="30" height="3.5" rx="1.75" fill="url(#gb2)" opacity=".7"/><circle cx="70" cy="54" r="8" fill="url(#gb2)"/><circle cx="70" cy="54" r="3" fill="#fff"/></svg>
+        </div>
+        <span class="label">48px</span>
+      </div>
+      <div class="size-item s128">
+        <div class="size-box" style="background:#ede9fe;">
+          <svg viewBox="0 0 96 96" fill="none"><defs><linearGradient id="gb3" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect x="18" y="14" width="48" height="68" rx="8" fill="#fff" stroke="url(#gb3)" stroke-width="2.5"/><path d="M50 14L66 30V22Q66 14 58 14Z" fill="url(#gb3)"/><rect x="26" y="33" width="30" height="3.5" rx="1.75" fill="url(#gb3)" opacity=".7"/><circle cx="70" cy="54" r="8" fill="url(#gb3)"/><circle cx="70" cy="54" r="3" fill="#fff"/></svg>
+        </div>
+        <span class="label">128px</span>
+      </div>
+    </div>
+
+    <div class="chrome-mock">
+      <svg class="icon-chrome" viewBox="0 0 96 96" fill="none"><defs><linearGradient id="gbC" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect x="18" y="14" width="48" height="68" rx="8" fill="#fff" stroke="url(#gbC)" stroke-width="2.5"/><path d="M50 14L66 30V22Q66 14 58 14Z" fill="url(#gbC)"/><rect x="26" y="33" width="30" height="3.5" rx="1.75" fill="url(#gbC)" opacity=".7"/><circle cx="70" cy="54" r="8" fill="url(#gbC)"/><circle cx="70" cy="54" r="3" fill="#fff"/></svg>
+      <span class="bar-text">Prompt Manager</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 方案 C：品牌 IP / 暗色科技 ==================== -->
+<div class="card">
+  <div class="card-label">
+    <div class="tag tag-c">C</div>
+    <h3>暗色科技 Dark Tech Brand</h3>
+    <span>个性 · 高识别度</span>
+  </div>
+  <div class="card-body">
+    <div class="icon-showcase showcase-c">
+      <!-- SVG C: 暗色科技 - 终端窗口 + 魔法光标 + 浮动代码 -->
+      <defs>
+        <linearGradient id="gradC-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1e1b4b"/>
+          <stop offset="100%" stop-color="#312e81"/>
+        </linearGradient>
+        <linearGradient id="gradC-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#06b6d4"/>
+          <stop offset="50%" stop-color="#8b5cf6"/>
+          <stop offset="100%" stop-color="#ec4899"/>
+        </linearGradient>
+        <linearGradient id="gradC-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#06b6d4"/>
+          <stop offset="100%" stop-color="#22d3ee"/>
+        </linearGradient>
+        <filter id="glowC" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="neonC" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 深色终端背景 -->
+        <rect x="14" y="14" width="60" height="68" rx="10" fill="url(#gradC-bg)" stroke="#3730a3" stroke-width="1.5"/>
+        <!-- 标题栏 -->
+        <rect x="14" y="14" width="60" height="14" rx="10" fill="rgba(255,255,255,.05)"/>
+        <rect x="14" y="24" width="60" height="4" fill="url(#gradC-bg)"/> <!-- cover bottom of title bar radius -->
+        <!-- 窗口按钮 -->
+        <circle cx="24" cy="21" r="2.5" fill="#ef4444" opacity=".8"/>
+        <circle cx="32" cy="21" r="2.5" fill="#f59e0b" opacity=".8"/>
+        <circle cx="40" cy="21" r="2.5" fill="#10b981" opacity=".8"/>
+        <!-- 代码行 -->
+        <rect x="23" y="38" width="18" height="3" rx="1.5" fill="#06b6d4" opacity=".7"/>
+        <rect x="23" y="47" width="28" height="3" rx="1.5" fill="#a78bfa" opacity=".55"/>
+        <rect x="23" y="56" width="14" height="3" rx="1.5" fill="#06b6d4" opacity=".45"/>
+        <rect x="23" y="65" width="22" height="3" rx="1.5" fill="#a78bfa" opacity=".35"/>
+        <!-- 光标闪烁 -->
+        <rect x="43" y="65" width="2.5" height="4.5" rx="0.5" fill="#22d3ee" filter="url(#glowC)">
+          <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite"/>
+        </rect>
+        <!-- 浮动元素 -->
+        <g filter="url(#neonC)">
+          <!-- 左括号 -->
+          <text x="74" y="36" font-family="monospace" font-size="14" font-weight="bold" fill="#06b6d4">{</text>
+          <!-- 右括号 -->
+          <text x="73" y="80" font-family="monospace" font-size="14" font-weight="bold" fill="#ec4899">}</text>
+          <!-- 星星装饰 -->
+          <g transform="translate(82, 52)">
+            <path d="M0 -6 L1.5 -1.5 L6 0 L1.5 1.5 L0 6 L-1.5 1.5 L-6 0 L-1.5 -1.5 Z" fill="url(#gradC-accent)"/>
+          </g>
+          <!-- 小圆点 -->
+          <circle cx="79" cy="44" r="2" fill="#8b5cf6" opacity=".8"/>
+          <circle cx="69" cy="74" r="1.5" fill="#06b6d4" opacity=".6"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="features">
+      <span>✓ 暗色主题友好</span><span>✓ Cyan+Violet+Pink</span>
+      <span>✓ 动态光标动画</span><span>✓ 强品牌辨识度</span>
+    </div>
+
+    <div class="sizes">
+      <div class="size-item s16">
+        <div class="size-box" style="background:#1e1b4b;">
+          <svg viewBox="0 0 96 96" fill="none"><rect x="14" y="14" width="60" height="68" rx="10" fill="#1e1b4b" stroke="#3730a3" stroke-width="1.5"/><rect x="23" y="38" width="18" height="3" rx="1.5" fill="#06b6d4" opacity=".7"/><rect x="23" y="47" width="28" height="3" rx="1.5" fill="#a78bfa" opacity=".55"/><text x="74" y="36" font-family="monospace" font-size="14" font-weight="bold" fill="#06b6d4">{</text></svg>
+        </div>
+        <span class="label">16px</span>
+      </div>
+      <div class="size-item s48">
+        <div class="size-box" style="background:#1e1b4b;">
+          <svg viewBox="0 0 96 96" fill="none"><rect x="14" y="14" width="60" height="68" rx="10" fill="#1e1b4b" stroke="#3730a3" stroke-width="1.5"/><circle cx="24" cy="21" r="2.5" fill="#ef4444" opacity=".8"/><circle cx="32" cy="21" r="2.5" fill="#f59e0b" opacity=".8"/><circle cx="40" cy="21" r="2.5" fill="#10b981" opacity=".8"/><rect x="23" y="38" width="18" height="3" rx="1.5" fill="#06b6d4" opacity=".7"/><rect x="23" y="47" width="28" height="3" rx="1.5" fill="#a78bfa" opacity=".55"/><text x="74" y="36" font-family="monospace" font-size="14" font-weight="bold" fill="#06b6d4">{</text><text x="73" y="80" font-family="monospace" font-size="14" font-weight="bold" fill="#ec4899">}</text></svg>
+        </div>
+        <span class="label">48px</span>
+      </div>
+      <div class="size-item s128">
+        <div class="size-box" style="background:#1e1b4b;">
+          <svg viewBox="0 0 96 96" fill="none"><rect x="14" y="14" width="60" height="68" rx="10" fill="#1e1b4b" stroke="#3730a3" stroke-width="1.5"/><circle cx="24" cy="21" r="2.5" fill="#ef4444" opacity=".8"/><circle cx="32" cy="21" r="2.5" fill="#f59e0b" opacity=".8"/><circle cx="40" cy="21" r="2.5" fill="#10b981" opacity=".8"/><rect x="23" y="38" width="18" height="3" rx="1.5" fill="#06b6d4" opacity=".7"/><rect x="23" y="47" width="28" height="3" rx="1.5" fill="#a78bfa" opacity=".55"/><text x="74" y="36" font-family="monospace" font-size="14" font-weight="bold" fill="#06b6d4">{</text><text x="73" y="80" font-family="monospace" font-size="14" font-weight="bold" fill="#ec4899">}</text></svg>
+        </div>
+        <span class="label">128px</span>
+      </div>
+    </div>
+
+    <div class="chrome-mock">
+      <svg class="icon-chrome" viewBox="0 0 96 96" fill="none"><rect x="14" y="14" width="60" height="68" rx="10" fill="#1e1b4b" stroke="#3730a3" stroke-width="1.5"/><circle cx="24" cy="21" r="2.5" fill="#ef4444" opacity=".8"/><circle cx="32" cy="21" r="2.5" fill="#f59e0b" opacity=".8"/><circle cx="40" cy="21" r="2.5" fill="#10b981" opacity=".8"/><rect x="23" y="38" width="18" height="3" rx="1.5" fill="#06b6d4" opacity=".7"/><rect x="23" y="47" width="28" height="3" rx="1.5" fill="#a78bfa" opacity=".55"/><text x="74" y="36" font-family="monospace" font-size="14" font-weight="bold" fill="#06b6d4">{</text><text x="73" y="80" font-family="monospace" font-size="14" font-weight="bold" fill="#ec4899">}</text></svg>
+      <span class="bar-text">Prompt Manager</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.grid -->
+
+<div class="footer">
+  <p>Prompt Manager Plugin · Chrome Extension Icon Design · 3 Proposals</p>
+  <p style="margin-top: 6px; font-size: 11px; opacity: .5;">SVG Vector Icons · Scalable to any size · Ready for Web Store submission</p>
+</div>
+
+</body>
+</html>

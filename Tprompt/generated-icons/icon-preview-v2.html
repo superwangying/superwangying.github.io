@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Prompt Manager · 极简欧美风 Icon 设计方案</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --text: #1a1a2e;
+    --text2: #6b7280;
+    --border: #e5e7eb;
+    --accent: #3b82f6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  .header { text-align: center; margin-bottom: 48px; }
+  .header h1 {
+    font-size: 28px; font-weight: 700; letter-spacing: -.5px;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .header p { color: var(--text2); font-size: 14.5px; }
+  .ref-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 20px;
+    background: #fff; border: 1px solid var(--border);
+    font-size: 12.5px; color: var(--text2); margin-top: 14px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    max-width: 1240px; margin: 0 auto;
+  }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; max-width: 460px; } }
+
+  .card {
+    background: var(--surface); border-radius: 16px;
+    border: 1px solid var(--border); overflow: hidden;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 48px rgba(0,0,0,.10), 0 0 0 1px rgba(59,130,246,.08);
+  }
+
+  .card-label {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #fafbff, transparent);
+  }
+  .tag {
+    width: 30px; height: 30px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0; color: #fff;
+  }
+  .tag-a { background: #374151; }
+  .tag-b { background: #475569; }
+  .tag-c { background: #334155; }
+  .card-label h3 { font-size: 15.5px; font-weight: 600; flex: 1; }
+  .card-label span {
+    font-size: 11px; color: var(--text2); background: #f3f4f6;
+    padding: 3px 10px; border-radius: 10px;
+  }
+
+  .card-body { padding: 36px 20px 28px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+
+  /* ===== 主展示区 ===== */
+  .icon-showcase {
+    width: 172px; height: 172px; border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    background: linear-gradient(145deg, #eef0f4, #dce0e9);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.65),
+      inset 0 -2px 6px rgba(0,0,0,.04),
+      0 10px 36px rgba(0,0,0,.08);
+  }
+  .icon-showcase svg { width: 110px; height: 110px; }
+
+  /* ===== 尺寸对比行 ===== */
+  .sizes { display: flex; gap: 24px; align-items: flex-end; justify-content: center; width: 100%; padding: 16px 0; border-top: 1px solid var(--border); }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .size-item .label { font-size: 10px; color: var(--text2); font-weight: 600; letter-spacing: .8px; text-transform: uppercase; opacity: .7; }
+  .size-box {
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; background: linear-gradient(145deg, #eef0f4, #dce0e9);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 2px 8px rgba(0,0,0,.05);
+    border: 1px solid rgba(0,0,0,.04);
+  }
+  .size-box svg { display: block; }
+  .s16 { width: 34px; height: 34px; }   .s16 svg { width: 18px; height: 18px; }
+  .s48 { width: 58px; height: 58px; border-radius: 11px; }   .s48 svg { width: 38px; height: 38px; }
+  .s128{ width: 92px; height: 92px; border-radius: 14px; } .s128 svg { width: 66px; height: 66px; }
+
+  /* Chrome 工具栏模拟 */
+  .chrome-mock {
+    display: flex; align-items: center; gap: 8px;
+    background: #e5e7eb; border-radius: 8px; padding: 8px 12px 8px 10px;
+    border: 1px solid #d1d5db; width: 100%;
+  }
+  .chrome-mock::before {
+    content: ''; width: 16px; height: 16px; flex-shrink: 0;
+    border-radius: 50%; background: #9ca3af;
+  }
+  .chrome-mock svg.icon-chrome { width: 16px !important; height: 16px !important; flex-shrink: 0; }
+  .chrome-mock .bar-text { font-size: 11px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* 特性标签 */
+  .features { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; width: 100%; }
+  .features span {
+    font-size: 11px; padding: 4px 11px; border-radius: 7px;
+    background: #f8f9fa; color: var(--text2);
+    border: 1px solid #eee;
+  }
+
+  /* 参考图 */
+  .ref-section { text-align: center; margin-top: 52px; max-width: 200px; margin-left: auto; margin-right: auto; }
+  .ref-section h4 { font-size: 12px; color: var(--text2); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .footer { text-align: center; margin-top: 56px; color: var(--text2); font-size: 12.5px; opacity: .6; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✦ Prompt Manager · Minimalist Icon</h1>
+  <p>极简欧美风 · 深色底板 + 白色图标 · 3 版设计方案</p>
+  <div class="ref-badge">
+    <span>📐 风格参考：深灰六边形底板 / 白色极简线条 / Material Design 语言</span>
+  </div>
+</div>
+
+<div class="grid">
+
+<!-- ============================================================
+     方案 A：六边形底 + Prompt 文档
+     完美复刻参考图风格，六边形深灰底板，白色文档+AI提示符
+============================================================ -->
+<div class="card">
+  <div class="card-label">
+    <div class="tag tag-a">A</div>
+    <h3>Hexagon + Document</h3>
+    <span>经典欧美风</span>
+  </div>
+  <div class="card-body">
+    <div class="icon-showcase">
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 浅灰圆角矩形垫底 + 深灰六边形底板（与参考图一致） -->
+        <defs>
+          <linearGradient id="hexGradA" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4a4f5a"/>
+            <stop offset="100%" stop-color="#373b44"/>
+          </linearGradient>
+          <filter id="shadowA" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".15"/>
+          </filter>
+        </defs>
+        <!-- 浅色垫底（关键：解决 Chrome 图标透明区变白问题） -->
+        <rect x="0" y="0" width="120" height="120" rx="22" fill="#eef0f4" filter="url(#shadowA)"/>
+        <!-- 六边形深灰底板 -->
+        <polygon
+          points="60,14.3 103.7,39.5 103.7,80.5 60,105.7 16.3,80.5 16.3,39.5"
+          fill="url(#hexGradA)"
+        />
+        <!-- 内部白色图标：文档 + 提示符号 -->
+        <g transform="translate(32, 26)">
+          <!-- 文档主体 -->
+          <rect x="6" y="2" width="42" height="54" rx="4" stroke="white" stroke-width="3" fill="none"/>
+          <!-- 折角 -->
+          <path d="M36 2 L48 14 L48 8 Q48 2 42 2 Z" fill="white" opacity=".85"/>
+          <!-- 文字线 -->
+          <line x1="14" y1="19" x2="40" y2="19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="14" y1="28" x2="35" y2="28" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".65"/>
+          <line x1="14" y1="37" x2="38" y2="37" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".45"/>
+          <!-- 底部提示符 >_ -->
+          <path d="M14 47 L21 53 L14 59" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="23" y1="59" x2="34" y2="59" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="features">
+      <span>🔷 Hexagon 底板</span><span>📄 文档折角</span>
+      <span>💬 Terminal 提示符</span><span>⚪ 纯白线条</span>
+    </div>
+
+    <div class="sizes">
+      <div class="size-item s16"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><rect x="0" y="0" width="120" height="120" rx="22" fill="#eef0f4"/><polygon points="60,14.3 103.7,39.5 103.7,80.5 60,105.7 16.3,80.5 16.3,39.5" fill="#3f434d"/><g transform="translate(32,26)"><rect x="6" y="2" width="42" height="54" rx="4" stroke="white" stroke-width="3" fill="none"/><path d="M36 2 L48 14 L48 8 Q48 2 42 2 Z" fill="white" opacity=".85"/><line x1="14" y1="19" x2="40" y2="19" stroke="white" stroke-width="2.5" stroke-linecap="round"/><path d="M14 47 L21 53 L14 59" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><span class="label">16px</span></div>
+      <div class="size-item s48"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><rect x="0" y="0" width="120" height="120" rx="22" fill="#eef0f4"/><polygon points="60,14.3 103.7,39.5 103.7,80.5 60,105.7 16.3,80.5 16.3,39.5" fill="#3f434d"/><g transform="translate(32,26)"><rect x="6" y="2" width="42" height="54" rx="4" stroke="white" stroke-width="3" fill="none"/><path d="M36 2 L48 14 L48 8 Q48 2 42 2 Z" fill="white" opacity=".85"/><line x1="14" y1="19" x2="40" y2="19" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="14" y1="28" x2="35" y2="28" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".65"/><path d="M14 47 L21 53 L14 59" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><span class="label">48px</span></div>
+      <div class="size-item s128"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><rect x="0" y="0" width="120" height="120" rx="22" fill="#eef0f4"/><polygon points="60,14.3 103.7,39.5 103.7,80.5 60,105.7 16.3,80.5 16.3,39.5" fill="#3f434d"/><g transform="translate(32,26)"><rect x="6" y="2" width="42" height="54" rx="4" stroke="white" stroke-width="3" fill="none"/><path d="M36 2 L48 14 L48 8 Q48 2 42 2 Z" fill="white" opacity=".85"/><line x1="14" y1="19" x2="40" y2="19" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="14" y1="28" x2="35" y2="28" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".65"/><line x1="14" y1="37" x2="38" y2="37" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".45"/><path d="M14 47 L21 53 L14 59" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="23" y1="59" x2="34" y2="59" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div><span class="label">128px</span></div>
+    </div>
+
+    <div class="chrome-mock">
+      <svg class="icon-chrome" viewBox="0 0 120 120" fill="none"><rect x="0" y="0" width="120" height="120" rx="22" fill="#eef0f4"/><polygon points="60,14.3 103.7,39.5 103.7,80.5 60,105.7 16.3,80.5 16.3,39.5" fill="#3f434d"/><g transform="translate(32,26)"><rect x="6" y="2" width="42" height="54" rx="4" stroke="white" stroke-width="3" fill="none"/><path d="M36 2 L48 14 L48 8 Q48 2 42 2 Z" fill="white" opacity=".85"/><line x1="14" y1="19" x2="40" y2="19" stroke="white" stroke-width="2.5" stroke-linecap="round"/><path d="M14 47 L21 53 L14 59" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      <span class="bar-text">Prompt Manager</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     方案 B：圆角矩形 + 代码块
+     更现代的圆角矩形底板，代码编辑器风格，{} 符号
+============================================================ -->
+<div class="card">
+  <div class="card-label">
+    <div class="tag tag-b">B</div>
+    <h3>Rounded Square + Code</h3>
+    <span>现代开发感</span>
+  </div>
+  <div class="card-body">
+    <div class="icon-showcase">
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sqGradB" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#404550"/>
+            <stop offset="100%" stop-color="#2c3038"/>
+          </linearGradient>
+          <filter id="shadowB" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".2"/>
+          </filter>
+        </defs>
+        <!-- 圆角矩形底 -->
+        <rect x="10" y="10" width="100" height="100" rx="22" fill="url(#sqGradB)" filter="url(#shadowB)"/>
+        <!-- 内部图标：代码块 {} + 光标 -->
+        <g transform="translate(26, 26)">
+          <!-- 左大括号 -->
+          <path d="M16 6 C6 6, 6 17, 6 25 C6 31, 3 34, 0 34 C3 34, 6 37, 6 43 C6 51, 6 62, 16 62"
+                stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <!-- 右大括号 -->
+          <path d="M52 6 C62 6, 62 17, 62 25 C62 31, 65 34, 68 34 C65 34, 62 37, 62 43 C62 51, 62 62, 52 62"
+                stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <!-- 中间光标闪烁条 -->
+          <rect x="29" y="22" width="4" height="24" rx="2" fill="white">
+            <animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/>
+          </rect>
+        </g>
+      </svg>
+    </div>
+
+    <div class="features">
+      <span>◼ Rounded Rect</span><span>{ } Code Brackets</span>
+      <span>▎ Blinking Cursor</span><span>Developer Aesthetic</span>
+    </div>
+
+    <div class="sizes">
+      <div class="size-item s16"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><rect x="10" y="10" width="100" height="100" rx="22" fill="#353a44"/><g transform="translate(26,26)"><path d="M16 6C6 6 6 17 6 25C6 31 3 34 0 34C3 34 6 37 6 43C6 51 6 62 16 62" stroke="white" stroke-w="4" fill="none"/><path d="M52 6C62 6 62 17 62 25C62 31 65 34 68 34C65 34 62 37 62 43C62 51 62 62 52 62" stroke="white" stroke-w="4" fill="none"/><rect x="29" y="22" w="4" h="24" rx="2" fill="white"/></svg></div><span class="label">16px</span></div>
+      <div class="size-item s48"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><rect x="10" y="10" width="100" height="100" rx="22" fill="#353a44"/><g transform="translate(26,26)"><path d="M16 6 C6 6, 6 17, 6 25 C6 31, 3 34, 0 34 C3 34, 6 37, 6 43 C6 51, 6 62, 16 62" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M52 6 C62 6, 62 17, 62 25 C62 31, 65 34, 68 34 C65 34, 62 37, 62 43 C62 51, 62 62, 52 62" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/><rect x="29" y="22" width="4" height="24" rx="2" fill="white"/></svg></div><span class="label">48px</span></div>
+      <div class="size-item s128"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><rect x="10" y="10" width="100" height="100" rx="22" fill="#353a44"/><g transform="translate(26,26)"><path d="M16 6 C6 6, 6 17, 6 25 C6 31, 3 34, 0 34 C3 34, 6 37, 6 43 C6 51, 6 62, 16 62" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M52 6 C62 6, 62 17, 62 25 C62 31, 65 34, 68 34 C65 34, 62 37, 62 43 C62 51, 62 62, 52 62" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/><rect x="29" y="22" width="4" height="24" rx="2" fill="white"><animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/></rect></svg></div><span class="label">128px</span></div>
+    </div>
+
+    <div class="chrome-mock">
+      <svg class="icon-chrome" viewBox="0 0 120 120" fill="none"><rect x="10" y="10" width="100" height="100" rx="22" fill="#353a44"/><g transform="translate(26,26)"><path d="M16 6 C6 6, 6 17, 6 25 C6 31, 3 34, 0 34 C3 34, 6 37, 6 43 C6 51, 6 62, 16 62" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M52 6 C62 6, 62 17, 62 25 C62 31, 65 34, 68 34 C65 34, 62 37, 62 43 C62 51, 62 62, 52 62" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/><rect x="29" y="22" width="4" height="24" rx="2" fill="white"/></svg>
+      <span class="bar-text">Prompt Manager</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     方案 C：圆形 + AI 闪电/Prompt 符号
+     最简洁的圆形底板，闪电或星芒代表 AI Prompt 概念
+============================================================ -->
+<div class="card">
+  <div class="card-label">
+    <div class="tag tag-c">C</div>
+    <h3>Circle + Lightning</h3>
+    <span>最极简</span>
+  </div>
+  <div class="card-body">
+    <div class="icon-showcase">
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="circGradC" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#454b57"/>
+            <stop offset="100%" stop-color="#333842"/>
+          </linearGradient>
+          <filter id="shadowC" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".2"/>
+          </filter>
+        </defs>
+        <!-- 圆形底板 -->
+        <circle cx="60" cy="60" r="50" fill="url(#circGradC)" filter="url(#shadowC)"/>
+        <!-- 内部图标：闪电/Prompt 符号 — 代表 "触发/AI响应" -->
+        <g transform="translate(60, 60)">
+          <!-- 闪电主体 -->
+          <path
+            d="M-4 -28 L-18 2 L-2 2 L-6 30 L18 -4 L0 -4 Z"
+            fill="white"
+          />
+          <!-- 小点缀：右上角小点代表 "发送/输出" -->
+          <circle cx="22" cy="-16" r="3.5" fill="white" opacity=".6"/>
+          <circle cx="26" cy="-4" r="2" fill="white" opacity=".35"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="features">
+      <span>● Circle Base</span><span>⚡ Lightning Bolt</span>
+      <span>✦ Output Dots</span><span>Maximum Simplicity</span>
+    </div>
+
+    <div class="sizes">
+      <div class="size-item s16"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><circle cx="60" cy="60" r="50" fill="#3a3f4a"/><g transform="translate(60,60)"><path d="M-4 -28 L-18 2 L-2 2 L-6 30 L18 -4 L0 -4 Z" fill="white"/></svg></div><span class="label">16px</span></div>
+      <div class="size-item s48"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><circle cx="60" cy="60" r="50" fill="#3a3f4a"/><g transform="translate(60,60)"><path d="M-4 -28 L-18 2 L-2 2 L-6 30 L18 -4 L0 -4 Z" fill="white"/><circle cx="22" cy="-16" r="3.5" fill="white" opacity=".6"/></svg></div><span class="label">48px</span></div>
+      <div class="size-item s128"><div class="size-box"><svg viewBox="0 0 120 120" fill="none"><circle cx="60" cy="60" r="50" fill="#3a3f4a"/><g transform="translate(60,60)"><path d="M-4 -28 L-18 2 L-2 2 L-6 30 L18 -4 L0 -4 Z" fill="white"/><circle cx="22" cy="-16" r="3.5" fill="white" opacity=".6"/><circle cx="26" cy="-4" r="2" fill="white" opacity=".35"/></svg></div><span class="label">128px</span></div>
+    </div>
+
+    <div class="chrome-mock">
+      <svg class="icon-chrome" viewBox="0 0 120 120" fill="none"><circle cx="60" cy="60" r="50" fill="#3a3f4a"/><g transform="translate(60,60)"><path d="M-4 -28 L-18 2 L-2 2 L-6 30 L18 -4 L0 -4 Z" fill="white"/></svg>
+      <span class="bar-text">Prompt Manager</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.grid -->
+
+<!-- 参考图说明 -->
+<div class="ref-section">
+  <h4>Reference Style</h4>
+  <p style="font-size: 11px; color: var(--text2); line-height: 1.6;">
+    深灰色几何底板 (Hexagon/Square/Circle)<br>
+    白色纯线条图标，无渐变无阴影<br>
+    Material Design / Bootstrap Icons 风格<br>
+    高对比度，小尺寸清晰可辨
+  </p>
+</div>
+
+<div class="footer">
+  Prompt Manager Plugin · Minimalist Western Style · 3 Proposals
+</div>
+
+</body>
+</html>
