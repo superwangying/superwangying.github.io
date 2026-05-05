@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperWangYing — Product Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ===== 全局变量 ===== */
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #fafafa;
+      --fg: #000000;
+      --fg-secondary: #222222;
+      --fg-muted: #666666;
+      --border: #e5e5e5;
+      --accent: #000000;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Menlo', monospace;
+      --transition: 0.15s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-secondary: #111111;
+      --fg: #e8e8e8;
+      --fg-secondary: #cccccc;
+      --fg-muted: #999999;
+      --border: #1a1a1a;
+      --accent: #ffffff;
+    }
+
+    /* ===== Reset ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: var(--font-sans); cursor: pointer; border: none; background: none; }
+    ul { list-style: none; }
+
+    /* ===== 布局 ===== */
+    .home-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 80px 40px 60px;
+    }
+
+    /* ===== 顶部导航 ===== */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+    .logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--fg); }
+    .theme-toggle {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      transition: background var(--transition);
+    }
+    .theme-toggle:hover { background: var(--bg-secondary); }
+
+    /* ===== Hero ===== */
+    .hero { margin-bottom: 72px; }
+    .hero-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--fg-muted); font-weight: 400; }
+    .hero-desc {
+      font-size: 13px;
+      color: var(--fg-secondary);
+      line-height: 1.7;
+      max-width: 480px;
+    }
+
+    /* ===== 产品网格 ===== */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .product-card {
+      background: var(--bg);
+      padding: 28px 24px;
+      display: flex; flex-direction: column;
+      transition: background var(--transition);
+      cursor: pointer;
+    }
+    .product-card:hover { background: var(--bg-secondary); }
+    .product-card-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .product-icon {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .product-status {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+    }
+    .product-status.live { border-color: var(--fg); color: var(--fg); }
+    .product-status.beta { color: var(--fg-muted); }
+    .product-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+    .product-card p {
+      font-size: 12px;
+      color: var(--fg-secondary);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    .product-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .product-tags span {
+      font-size: 10px;
+      color: var(--fg-muted);
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+    }
+    .product-link {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 6px;
+      transition: gap var(--transition);
+    }
+    .product-card:hover .product-link { gap: 10px; }
+
+    /* ===== 统计栏 ===== */
+    .stats-bar {
+      display: flex;
+      border: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    .stat-item {
+      flex: 1;
+      padding: 20px 24px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+
+    /* ===== Footer ===== */
+    .footer {
+      margin-top: 80px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer p { font-size: 11px; color: var(--fg-muted); }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a { font-size: 11px; color: var(--fg-muted); }
+    .footer-links a:hover { color: var(--fg); }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 640px) {
+      .home-container { padding: 72px 20px 40px; }
+      .top-bar { padding: 0 20px; }
+      .hero h1 { font-size: 28px; }
+      .product-grid { grid-template-columns: 1fr; }
+      .stats-bar { flex-direction: column; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部导航 -->
+    <nav class="top-bar">
+      <div class="logo">SuperWangYing</div>
+      <div class="nav-links">
+        <a href="#products">Products</a>
+        <a href="#about">About</a>
+      </div>
+      <button class="theme-toggle" id="themeBtn">■</button>
+    </nav>
+
+    <div class="home-container">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-label">Portfolio / Products</div>
+        <h1>SuperWangYing<br><span>Product Showcase</span></h1>
+        <p class="hero-desc">
+          A collection of tools and products designed for developers and AI enthusiasts.
+          Clean, fast, and privacy-first.
+        </p>
+      </section>
+
+      <!-- 产品区 -->
+      <div class="section-label" id="products">Products</div>
+      <div class="product-grid" id="productGrid">
+        <!-- 产品卡片将由 JavaScript 动态生成 -->
+      </div>
+
+      <!-- 统计栏 -->
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+          <div class="stat-value" id="liveCount">0</div>
+          <div class="stat-label">Live Products</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="devCount">0</div>
+          <div class="stat-label">In Development</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="totalStars">0</div>
+          <div class="stat-label">Total Stars</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">2026</div>
+          <div class="stat-label">Founded</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>© 2026 SuperWangYing</p>
+        <div class="footer-links">
+          <a href="https://github.com/superwangying">GitHub</a>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ===== JS ===== -->
+  <script>
+    // 主题切换
+    const themeBtn = document.getElementById('themeBtn');
+    function setTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('theme', t);
+      themeBtn.textContent = t === 'dark' ? '□' : '■';
+    }
+    themeBtn.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+    // 初始化主题
+    const saved = localStorage.getItem('theme');
+    if (saved) setTheme(saved);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+
+    // 动态加载产品数据
+    async function loadProducts() {
+      try {
+        const response = await fetch('/data/products.json');
+        const data = await response.json();
+        const products = data.products || [];
+
+        // 排除 welcome 占位产品，按 order 排序
+        const validProducts = products
+          .filter(p => p.id !== 'welcome')
+          .sort((a, b) => (a.order || 999) - (b.order || 999));
+
+        renderProducts(validProducts);
+        updateStats(validProducts);
+      } catch (error) {
+        console.error('Failed to load products:', error);
+      }
+    }
+
+    // 渲染产品卡片
+    function renderProducts(products) {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+
+      products.forEach(product => {
+        const card = document.createElement(product.links?.demo ? 'a' : 'div');
+        if (product.links?.demo) {
+          card.href = product.links.demo;
+          card.className = 'product-card';
+        } else {
+          card.className = 'product-card';
+        }
+
+        const statusClass = product.status === '活跃开发' || product.status === 'Live' ? 'live' : 'beta';
+        const statusText = product.status === '活跃开发' || product.status === 'Live' ? 'LIVE' : 'BETA';
+
+        const techTags = (product.tech || []).slice(0, 3).map(t => `<span>${t}</span>`).join('');
+
+        card.innerHTML = `
+          <div class="product-card-header">
+            <div class="product-icon">${product.icon || '◇'}</div>
+            <div class="product-status ${statusClass}">${statusText}</div>
+          </div>
+          <h3>${product.name}</h3>
+          <p>${product.tagline}</p>
+          <div class="product-tags">
+            ${techTags}
+          </div>
+          <div class="product-link">${product.links?.demo ? 'Explore →' : 'Learn more →'}</div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    // 更新统计栏
+    function updateStats(products) {
+      const liveCount = products.filter(p =>
+        p.status === '活跃开发' || p.status === 'Live'
+      ).length;
+      const devCount = products.filter(p =>
+        p.status !== '活跃开发' && p.status !== 'Live'
+      ).length;
+      const totalStars = products.reduce((sum, p) => sum + (p.stars || 0), 0);
+
+      document.getElementById('liveCount').textContent = liveCount;
+      document.getElementById('devCount').textContent = devCount;
+      document.getElementById('totalStars').textContent = totalStars;
+    }
+
+    // 页面加载时执行
+    loadProducts();
+  </script>
+</body>
+</html>

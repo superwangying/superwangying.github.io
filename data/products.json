@@ -1,0 +1,275 @@
+{
+  "products": [
+    {
+      "id": "chatark",
+      "name": "ChatArk · AI 聊天记录管理器",
+      "tagline": "多平台 AI 对话记录便携管理，纯本地 IndexedDB 存储",
+      "description": "一款 AI 聊天记录便携管理器，支持导入 ChatGPT、Claude、Gemini 等多平台导出文件，统一解析、本地存储、完美复刻对话内容。基于 IndexedDB 纯前端运行，支持 Markdown 渲染、语法高亮、全文搜索、收藏标签、虚拟滚动、Gist 加密云同步等功能。",
+      "category": "apps",
+      "icon": "💬",
+      "cover": "",
+      "features": [
+        "多平台导入：支持 ChatGPT、Claude、Gemini、Generic JSON 四种格式",
+        "完美复刻：Markdown 渲染 + highlight.js 语法高亮 + 代码块 Copy",
+        "思考块渲染：Claude 等模型 <thinking> 内容折叠展示",
+        "消息图片渲染：自动检测图片 URL/base64，可点击放大",
+        "双模式搜索：标题搜索 + 消息全文搜索（MSG 模式），搜索高亮",
+        "收藏与标签：对话收藏、自定义标签、多维度筛选过滤",
+        "虚拟滚动：消息列表 >80 条自动启用，零第三方依赖",
+        "多分支支持：ChatGPT parser BFS 提取所有分支路径 + 切换 Tab",
+        "导出功能：单对话导出 Markdown/TXT，全量数据 JSON 备份恢复",
+        "Gist 云同步：AES-256-GCM 端到端加密，跨设备同步",
+        "三主题切换：Light / Dark / Auto 跟随系统",
+        "键盘快捷键：/ 聚焦搜索、↑↓ 导航、Ctrl+I 导入、Esc 返回"
+      ],
+      "highlights": [
+        "支持 ChatGPT / Claude / Gemini 多平台",
+        "纯本地 IndexedDB，零云端依赖",
+        "Gist AES-256-GCM 加密云同步",
+        "虚拟滚动 + 全文搜索 + 搜索高亮"
+      ],
+      "tech": ["Vue 3", "TypeScript", "Vite", "Pinia", "Dexie", "markdown-it", "highlight.js"],
+      "status": "活跃开发",
+      "links": {
+        "demo": "https://superwangying.github.io/products/chatark/index.html"
+      },
+      "githubRepo": "superwangying.github.io",
+      "stars": 0,
+      "version": "1.0.0",
+      "updateDate": "2026-04-30",
+      "order": 3
+    },
+    {
+      "id": "mymimi",
+      "name": "MYmimi · 密码保险箱",
+      "tagline": "纯本地加密密码管理器，数据完全掌握在自己手中",
+      "description": "一款功能完备的本地密码管理器，基于 Web Crypto API 端到端加密，所有数据存储在浏览器 localStorage 中，零云端依赖。支持网站密码、API 密钥、生活密码三大分类管理，提供密码生成器、搜索过滤、列表/卡片双视图、导入导出、恢复密钥等完整功能。",
+      "category": "tools",
+      "icon": "🔐",
+      "cover": "",
+      "pinned": true,
+      "featured": true,
+      "features": [
+        "端到端加密：基于 Web Crypto API (PBKDF2 + AES-GCM)，主密码保护所有数据",
+        "三大分类：网站密码、API 密钥、生活密码（Wi-Fi、门锁、银行卡等）",
+        "密码生成器：自定义长度、大小写、数字、特殊字符，一键生成强密码",
+        "搜索过滤：按名称、Key、笔记关键词实时搜索",
+        "双视图切换：列表视图 / 卡片视图，偏好自动保存",
+        "一键复制：复制密码/用户名到剪贴板，自动定时清除",
+        "导入导出：加密备份导出 .vault 文件，支持导入恢复",
+        "恢复密钥：独立恢复密钥机制，忘记主密码仍可找回数据",
+        "自动锁定：可配置自动锁定时间，离开自动保护",
+        "修改主密码：支持修改主密码，数据无缝迁移"
+      ],
+      "highlights": [
+        "Web Crypto API 端到端加密",
+        "零云端依赖，纯本地存储",
+        "恢复密钥防丢失机制",
+        "列表/卡片双视图切换"
+      ],
+      "tech": ["HTML", "CSS", "JavaScript", "Web Crypto API", "AES-GCM", "PBKDF2"],
+      "status": "活跃开发",
+      "links": {
+        "demo": "https://superwangying.github.io/products/mymimi/password-vault.html"
+      },
+      "githubRepo": "superwangying.github.io",
+      "stars": 0,
+      "version": "1.0.0",
+      "updateDate": "2026-04-30",
+      "order": 2
+    },
+    {
+      "id": "agentkit",
+      "name": "AgentKit · AI 代理工具包",
+      "tagline": "193 专业 AI Agent，任何环境即插即用",
+      "description": "便携式 193 专业 AI 代理系统，纯 Markdown 代理库，覆盖 14 大分类领域。零依赖、平台无关，支持 CLI 查询、复制粘贴、文件引用等多种使用方式，可在任何 AI 环境中即插即用。",
+      "category": "tools",
+      "icon": "🤖",
+      "cover": "",
+      "features": [
+        "193 个专业 Agent：覆盖编程语言、框架、DevOps、安全、数据AI等 14 大领域",
+        "CLI 工具：npx agentkit find/get/list/search 快速检索",
+        "零依赖运行：纯 Markdown 文件，Node.js ≥ 16 即可",
+        "平台无关：适用于 Claude、ChatGPT、Cursor、Copilot 等任何 AI 环境",
+        "多格式引用：复制粘贴、@引用、System Prompt、文件包含、CLI 管道",
+        "分类浏览：14 大分类，按语言/框架/领域快速定位",
+        "全文搜索：按名称、标签、分类关键词模糊匹配",
+        "IDE 适配：支持 CLAUDE.md、.cursorrules 等配置文件引用",
+        "开源协议：MIT License，自由使用和分发",
+        "持续更新：社区驱动，持续扩充 Agent 库"
+      ],
+      "highlights": [
+        "193 个专业 Agent，14 大分类领域",
+        "零依赖纯 Markdown，即插即用",
+        "平台无关，兼容所有 AI 环境",
+        "内置 CLI 工具，命令行快速检索"
+      ],
+      "tech": ["Node.js", "CLI", "Markdown", "JSON Registry"],
+      "status": "活跃开发",
+      "links": {
+        "demo": "https://superwangying.github.io/products/agentkit/index.html",
+        "github": "https://github.com/superwangying"
+      },
+      "githubRepo": "superwangying.github.io",
+      "stars": 0,
+      "version": "1.1.0",
+      "updateDate": "2026-04-28",
+      "order": 1
+    },
+    {
+      "id": "prompt-manager",
+      "name": "Prompt Manager · 提示词管理器",
+      "tagline": "纯本地 AI 提示词管理，隐私安全零云端依赖",
+      "description": "一款功能完备的浏览器提示词管理插件，基于 IndexedDB 本地存储，支持提示词的创建、编辑、分类、标签、收藏、全文搜索、导入导出及 GitHub Gist 云同步。零云端依赖，数据完全掌握在自己手中。",
+      "category": "extensions",
+      "icon": "🧠",
+      "cover": "",
+      "features": [
+        "提示词 CRUD：创建、编辑、删除、批量操作，支持标题/内容/描述/标签/分类/收藏/置顶",
+        "分类管理：自定义分类（名称/图标/颜色），支持二级分类、拖拽排序、右键菜单",
+        "全文搜索：MiniSearch 引擎，标题>标签>描述>内容多级权重，前缀匹配+模糊搜索",
+        "标签系统：多标签 AND 筛选，标签统计与横向滚动标签栏",
+        "排序系统：按更新时间/使用次数/创建时间/标题排序，置顶优先、收藏次之",
+        "导入导出：JSON / CSV / Markdown 三种格式，支持范围选择与冲突策略",
+        "GitHub Gist 同步：Token 认证，推送/拉取双向同步，自动查找或创建 Gist",
+        "主题切换：亮色/暗色/跟随系统，卡片/列表视图切换，字体大小调节",
+        "浏览器集成：快捷键 Ctrl+Shift+P 打开，右键菜单保存选中文字为提示词",
+        "Popup 快速访问：键盘导航（方向键+回车复制），Markdown 分段复制"
+      ],
+      "highlights": [
+        "纯本地 IndexedDB 存储，隐私绝对安全",
+        "GitHub Gist 云同步，跨设备数据互通",
+        "MiniSearch 全文搜索，毫秒级响应",
+        "Vue 3 + TypeScript + Dexie.js 现代技术栈"
+      ],
+      "tech": ["Vue 3", "TypeScript", "Vite", "Pinia", "Dexie.js", "MiniSearch", "UnoCSS", "Element Plus"],
+      "status": "活跃开发",
+      "links": {
+        "demo": "https://superwangying.github.io/products/prompt-manager/options.html",
+        "download": "https://superwangying.github.io/products/prompt-manager/releases/PromptManager-v1.0.0.crx",
+        "github": "https://github.com/superwangying"
+      },
+      "githubRepo": "superwangying.github.io",
+      "stars": 0,
+      "version": "1.0.0",
+      "updateDate": "2026-04-27",
+      "order": 1
+    },
+    {
+      "id": "novel-reader",
+      "name": "轻阅 · 本地小说阅读器",
+      "tagline": "纯净本地阅读，沉浸式小说体验",
+      "description": "一款轻量级本地小说阅读器，支持打开文件夹浏览章节目录，或直接拖拽文件阅读。提供亮色、护眼、绿意、暗色四种主题，支持字号调节、章节导航、阅读进度记忆等功能，打造专注沉浸的阅读体验。",
+      "category": "webapps",
+      "icon": "📖",
+      "cover": "",
+      "features": [
+        "本地文件阅读：支持 .txt 和 .md 格式文件",
+        "文件夹浏览：打开本地小说文件夹，自动识别章节目录",
+        "拖拽导入：直接拖拽文件到页面即可开始阅读",
+        "四种主题：亮色 / 护眼 / 绿意 / 暗色，随心切换",
+        "字号调节：自由放大缩小阅读字号",
+        "章节导航：侧边栏目录快速跳转章节",
+        "阅读进度：自动记忆阅读位置，下次继续",
+        "上下章切换：底部工具栏快速翻章",
+        "响应式设计：自适应桌面与移动端",
+        "零依赖纯前端：无需服务器，本地即可运行"
+      ],
+      "highlights": [
+        "纯本地运行，隐私安全",
+        "四种精美主题切换",
+        "拖拽即读，零门槛使用",
+        "零框架依赖，极致轻量"
+      ],
+      "tech": ["HTML5", "CSS3", "JavaScript", "File API", "Google Fonts"],
+      "status": "活跃开发",
+      "links": {
+        "demo": "https://superwangying.github.io/products/novel-reader.html",
+        "github": "https://github.com/superwangying"
+      },
+      "githubRepo": "superwangying.github.io",
+      "stars": 0,
+      "version": "1.0.0",
+      "updateDate": "2026-04-25",
+      "order": 2
+    },
+    {
+      "id": "webtoon-reader",
+      "name": "条漫阅读器",
+      "tagline": "沉浸式 Webtoon 阅读体验",
+      "description": "一款专为条漫/Webtoon 设计的本地阅读器，支持拖拽导入图片或选择文件夹浏览，提供连续滚动阅读模式。内置深色/亮色主题切换、图片间距调节、图片宽度控制、缩放浏览、全屏模式及阅读进度记忆等功能，打造流畅舒适的条漫阅读体验。",
+      "category": "webapps",
+      "icon": "🖼️",
+      "cover": "",
+      "features": [
+        "拖拽导入：直接拖拽图片文件到页面即可开始阅读",
+        "文件夹浏览：选择本地文件夹批量加载图片",
+        "连续滚动：长图/条漫连续滚动阅读模式",
+        "缩放浏览：支持图片缩放查看细节",
+        "间距调节：0-24px 自由调节图片间距",
+        "宽度控制：50%-100% 自定义图片显示宽度",
+        "深色模式：暗色/亮色主题一键切换",
+        "进度记忆：自动保存阅读位置，下次继续",
+        "全屏模式：沉浸式全屏阅读",
+        "响应式设计：自适应桌面与移动端"
+      ],
+      "highlights": [
+        "专为条漫/Webtoon 优化",
+        "拖拽即读，零门槛使用",
+        "丰富阅读设置，个性化体验",
+        "零依赖纯前端，极致轻量"
+      ],
+      "tech": ["HTML5", "CSS3", "JavaScript", "File API", "Google Fonts"],
+      "status": "活跃开发",
+      "links": {
+        "demo": "https://superwangying.github.io/products/webtoon-reader.html",
+        "github": "https://github.com/superwangying"
+      },
+      "githubRepo": "superwangying.github.io",
+      "stars": 0,
+      "version": "1.0.0",
+      "updateDate": "2026-04-26",
+      "order": 3
+    },
+    {
+      "id": "welcome",
+      "name": "更多产品即将上线",
+      "tagline": "持续构建中，敬请期待",
+      "description": "独立全栈开发者 SuperWangYing 的产品聚合展示。这里将汇集所有自研工具、开源项目和应用产品。每个产品都经过精心打磨，致力于提供优秀的开发者体验。",
+      "category": "tools",
+      "icon": "🚀",
+      "cover": "",
+      "features": [
+        "自研工具：提升开发效率的实用工具集",
+        "开源项目：面向社区的开源贡献",
+        "应用产品：精心设计的应用体验",
+        "持续更新：保持活跃开发与迭代"
+      ],
+      "highlights": [
+        "简约高级的极简设计风格",
+        "全平台自适应响应式布局",
+        "完善的分发渠道配置"
+      ],
+      "tech": ["HTML", "CSS", "JavaScript", "GitHub Pages"],
+      "status": "活跃开发",
+      "links": {
+        "github": "https://github.com/superwangying",
+        "website": "https://superwangying.github.io"
+      },
+      "githubRepo": "",
+      "stars": 0,
+      "version": "1.0.0",
+      "updateDate": "2026-04-25",
+      "order": 99
+    }
+  ],
+  "categories": [
+    { "id": "all", "name": "全部", "icon": "📋" },
+    { "id": "tools", "name": "自研工具", "icon": "🔧" },
+    { "id": "opensource", "name": "开源项目", "icon": "📦" },
+    { "id": "apps", "name": "应用产品", "icon": "📱" },
+    { "id": "webapps", "name": "Web 应用", "icon": "🌐" },
+    { "id": "extensions", "name": "浏览器插件", "icon": "🧩" },
+    { "id": "libraries", "name": "库/框架", "icon": "📚" }
+  ]
+}
