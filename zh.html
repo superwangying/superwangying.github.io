@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/products/chatark/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>王英的产品展示</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #fafafa;
+      --fg: #000000;
+      --fg-secondary: #222222;
+      --fg-muted: #666666;
+      --border: #e5e5e5;
+      --accent: #000000;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Menlo', monospace;
+      --transition: 0.15s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-secondary: #111111;
+      --fg: #e8e8e8;
+      --fg-secondary: #cccccc;
+      --fg-muted: #999999;
+      --border: #1a1a1a;
+      --accent: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: var(--font-sans); cursor: pointer; border: none; background: none; }
+    ul { list-style: none; }
+
+    .home-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 80px 40px 60px;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+    .logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--fg); }
+    .theme-toggle {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      transition: background var(--transition);
+    }
+    .theme-toggle:hover { background: var(--bg-secondary); }
+
+    /* Hero */
+    .hero { margin-bottom: 72px; }
+    .hero-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--fg-muted); font-weight: 400; }
+    .hero-desc {
+      font-size: 13px;
+      color: var(--fg-secondary);
+      line-height: 1.7;
+      max-width: 480px;
+    }
+
+    /* Section Label */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .product-card {
+      background: var(--bg);
+      padding: 28px 24px;
+      display: flex; flex-direction: column;
+      transition: background var(--transition);
+    }
+    .product-card:hover { background: var(--bg-secondary); }
+    .product-card-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .product-icon {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .product-status {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+    }
+    .product-status.live { border-color: var(--fg); color: var(--fg); }
+    .product-status.beta { color: var(--fg-muted); }
+    .product-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+    .product-card > p {
+      font-size: 12px;
+      color: var(--fg-secondary);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    .product-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .product-tags span {
+      font-size: 10px;
+      color: var(--fg-muted);
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+    }
+    .product-link {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 6px;
+      transition: gap var(--transition);
+    }
+    .product-card:hover .product-link { gap: 10px; }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      border: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    .stat-item {
+      flex: 1;
+      padding: 20px 24px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 80px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer p { font-size: 11px; color: var(--fg-muted); }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a { font-size: 11px; color: var(--fg-muted); }
+    .footer-links a:hover { color: var(--fg); }
+
+    @media (max-width: 640px) {
+      .home-container { padding: 72px 20px 40px; }
+      .top-bar { padding: 0 20px; }
+      .hero h1 { font-size: 28px; }
+      .product-grid { grid-template-columns: 1fr; }
+      .stats-bar { flex-direction: column; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-bar">
+    <div class="logo">SuperWangYing</div>
+    <div class="nav-links">
+      <a href="#products">产品</a>
+      <a href="#about">关于</a>
+    </div>
+    <button class="theme-toggle" id="themeBtn">■</button>
+  </nav>
+
+  <div class="home-container">
+    <section class="hero">
+      <div class="hero-label">作品集 / 产品</div>
+      <h1>王英<br><span>产品展示</span></h1>
+      <p class="hero-desc">
+        为开发者和 AI 爱好者打造的实用工具与产品。
+        简洁、快速、隐私优先。
+      </p>
+    </section>
+
+    <div class="section-label" id="products">产品</div>
+    <div class="product-grid">
+      <a href="/products/chatark/" class="product-card">
+        <div class="product-card-header">
+          <div class="product-icon">◆</div>
+          <div class="product-status live">已上线</div>
+        </div>
+        <h3>ChatArk</h3>
+        <p>AI 对话记录管理器。导入、浏览、搜索所有 AI 聊天历史，完整保留原始格式。隐私优先，完全运行在浏览器本地。</p>
+        <div class="product-tags">
+          <span>Vue 3</span>
+          <span>IndexedDB</span>
+          <span>隐私优先</span>
+        </div>
+        <div class="product-link">探索 →</div>
+      </a>
+
+      <div class="product-card">
+        <div class="product-card-header">
+          <div class="product-icon">◇</div>
+          <div class="product-status beta">即将上线</div>
+        </div>
+        <h3>产品二</h3>
+        <p>即将推出。此位置预留用于下一个产品发布。</p>
+        <div class="product-tags"><span>计划中</span></div>
+        <div class="product-link">了解更多 →</div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-card-header">
+          <div class="product-icon">○</div>
+          <div class="product-status beta">即将上线</div>
+        </div>
+        <h3>产品三</h3>
+        <p>即将推出。此位置预留用于下一个产品发布。</p>
+        <div class="product-tags"><span>计划中</span></div>
+        <div class="product-link">了解更多 →</div>
+      </div>
+    </div>
+
+    <!-- 统计栏 -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-value">4</div>
+        <div class="stat-label">AI 平台</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">2</div>
+        <div class="stat-label">导出格式</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">6</div>
+        <div class="stat-label">核心功能</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">0</div>
+        <div class="stat-label">数据收集</div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>© 2026 SuperWangYing</p>
+      <div class="footer-links">
+        <a href="https://github.com/superwangying">GitHub</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const themeBtn = document.getElementById('themeBtn');
+    function setTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('theme', t);
+      themeBtn.textContent = t === 'dark' ? '□' : '■';
+    }
+    themeBtn.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+    const saved = localStorage.getItem('theme');
+    if (saved) setTheme(saved);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+  </script>
+</body>
+</html>
