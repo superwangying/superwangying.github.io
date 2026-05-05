@@ -1,0 +1,28 @@
+[
+  {
+    "id": "chatark",
+    "name": "ChatArk",
+    "subtitle": "AI 聊天记录管理器",
+    "description": "便携式 AI 对话记录管理工具，支持 ChatGPT、Claude、Gemini 等多平台导入，本地 IndexedDB 存储，Gist 加密云同步。",
+    "icon": "💬",
+    "category": "Web 应用",
+    "version": "v1.0.0",
+    "date": "2026-04-29",
+    "features": [
+      "多平台导入：ChatGPT / Claude / Gemini / 通用 JSON",
+      "Markdown 渲染 + 语法高亮 + 思考块折叠",
+      "全文搜索高亮、收藏、标签、虚拟滚动",
+      "Gist AES-256-GCM 加密云同步",
+      "亮色/暗色主题，响应式布局"
+    ],
+    "highlights": [
+      "纯本地 IndexedDB，零云端依赖",
+      "端到端加密同步",
+      "支持 10 万+ 消息虚拟滚动"
+    ],
+    "links": {
+      "demo": "/products/chatark/index.html",
+      "github": "https://github.com/superwangying/superwangying.github.io/tree/main/products/chatark"
+    }
+  }
+]
