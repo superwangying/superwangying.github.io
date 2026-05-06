@@ -107,7 +107,7 @@
       "tech": ["Node.js", "CLI", "Markdown", "JSON Registry"],
       "status": "活跃开发",
       "links": {
-        "demo": "https://superwangying.github.io/products/agentkit/index.html",
+        "demo": "https://superwangying.github.io/products/agentkit/",
         "github": "https://github.com/superwangying"
       },
       "githubRepo": "superwangying.github.io",
