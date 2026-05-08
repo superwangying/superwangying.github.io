@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yyan · MarketPulse — 专业财经资讯聚合终端</title>
+<meta name="description" content="面向财经从业者的纯前端资讯聚合与发布平台，深蓝夜色终端风格，多源 RSS 抓取 + 本地持久化 + 发稿后台。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #ffffff;
+  --bg-secondary: #fafafa;
+  --fg: #000000;
+  --fg-secondary: #222222;
+  --fg-muted: #666666;
+  --border: #e5e5e5;
+  --accent: #000000;
+  --card-hover: #f5f5f5;
+  --pill-bg: #f0f0f0;
+  --pill-fg: #333333;
+  --code-bg: #f5f5f5;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --amber: #d4a843;
+  --amber-light: #f5e6c0;
+}
+
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --bg-secondary: #111111;
+  --fg: #e8e8e8;
+  --fg-secondary: #cccccc;
+  --fg-muted: #999999;
+  --border: #1a1a1a;
+  --accent: #ffffff;
+  --card-hover: #1a1a1a;
+  --pill-bg: #1e1e1e;
+  --pill-fg: #bbbbbb;
+  --code-bg: #161616;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+  --amber: #d4a843;
+  --amber-light: #3a3018;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.2s, color 0.2s;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===== Nav ===== */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s, border-color 0.2s;
+}
+.nav .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+.nav-logo {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+.nav-logo:hover { color: var(--fg); }
+.nav-logo .logo-icon { font-size: 18px; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--fg);
+  transition: background 0.15s, border-color 0.15s;
+}
+.nav-btn:hover { background: var(--bg-secondary); }
+.nav-link {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--fg-muted);
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.15s;
+}
+.nav-link:hover { color: var(--fg); background: var(--bg-secondary); }
+
+/* ===== Hero ===== */
+.hero {
+  padding: 80px 0 48px;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  margin-bottom: 24px;
+}
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+.hero h1 {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero h1 .accent { color: var(--amber); }
+.hero .subtitle {
+  font-size: 15px;
+  color: var(--fg-secondary);
+  max-width: 600px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+.hero-tags {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.hero-tags span {
+  font-size: 11px;
+  color: var(--pill-fg);
+  background: var(--pill-bg);
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-secondary:hover { background: var(--bg-secondary); }
+
+/* ===== Screenshots ===== */
+.screenshots {
+  padding: 32px 0 64px;
+}
+.screenshots-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+.screenshot-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.screenshot-item:hover {
+  box-shadow: var(--shadow-lg);
+}
+.screenshot-item img {
+  width: 100%;
+  display: block;
+}
+.screenshot-caption {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.screenshot-caption .caption-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+.screenshot-caption .caption-desc {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+/* Dual screenshot row */
+.screenshot-dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ===== Features ===== */
+.features {
+  padding: 64px 0;
+  border-top: 1px solid var(--border);
+}
+.features-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.feature-card {
+  background: var(--bg);
+  padding: 24px;
+  transition: background 0.15s;
+}
+.feature-card:hover { background: var(--bg-secondary); }
+.feature-icon {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+.feature-card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.feature-card p {
+  font-size: 12px;
+  color: var(--fg-secondary);
+  line-height: 1.6;
+}
+
+/* ===== Tech Stack ===== */
+.tech-section {
+  padding: 48px 0 64px;
+  border-top: 1px solid var(--border);
+}
+.tech-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 16px;
+}
+.tech-stack {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tech-stack span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pill-fg);
+  background: var(--pill-bg);
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* ===== CTA / Contact ===== */
+.cta-section {
+  padding: 64px 0 80px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.cta-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+.cta-section p {
+  font-size: 14px;
+  color: var(--fg-secondary);
+  max-width: 520px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+.cta-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 1px solid var(--amber);
+  background: var(--amber-light);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+/* ===== Footer ===== */
+.footer {
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer p { font-size: 11px; color: var(--fg-muted); }
+.footer-links { display: flex; gap: 16px; }
+.footer-links a {
+  font-size: 11px;
+  color: var(--fg-muted);
+  transition: color 0.15s;
+}
+.footer-links a:hover { color: var(--fg); }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 28px; }
+  .hero .subtitle { font-size: 13px; }
+  .screenshot-dual {
+    grid-template-columns: 1fr;
+  }
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  .container { padding: 0 16px; }
+  .hero { padding: 56px 0 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="container">
+    <a href="/" class="nav-logo">
+      <span class="logo-icon">◆</span> SuperWangYing
+    </a>
+    <div class="nav-actions">
+      <a href="/#products" class="nav-link">← All Products</a>
+      <button class="nav-btn" id="themeBtn" aria-label="Toggle theme">■</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Preview · Coming Soon
+    </div>
+    <h1>Yyan · <span class="accent">MarketPulse</span></h1>
+    <p class="subtitle">
+      面向财经从业者的纯前端资讯聚合与发布平台。<br>
+      自动抓取多源 RSS、IndexedDB 持久化存储、发稿后台管理，<br>
+      深蓝夜色终端风格，致敬彭博终端美学。
+    </p>
+    <div class="hero-tags">
+      <span>RSS 聚合</span>
+      <span>纯前端</span>
+      <span>IndexedDB</span>
+      <span>发稿后台</span>
+      <span>全文搜索</span>
+      <span>暗色终端</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#screenshots" class="btn-primary">View Screenshots ↓</a>
+      <a href="#contact" class="btn-secondary">Leave a Message</a>
+    </div>
+  </div>
+</section>
+
+<!-- Screenshots -->
+<section class="screenshots" id="screenshots">
+  <div class="container">
+    <div class="screenshots-label">Product Screenshots</div>
+
+    <!-- Homepage -->
+    <div class="screenshot-grid">
+      <div class="screenshot-item">
+        <img src="screenshot-home.png" alt="MarketPulse 首页 — 行情条 + 资讯卡片流" loading="lazy">
+        <div class="screenshot-caption">
+          <span class="caption-title">首页 · 资讯终端</span>
+          <span class="caption-desc">实时行情条 + 多列卡片布局 + 分类筛选</span>
+        </div>
+      </div>
+
+      <!-- Admin Login + Dashboard (dual) -->
+      <div class="screenshot-dual">
+        <div class="screenshot-item">
+          <img src="screenshot-admin-login.png" alt="MarketPulse 管理登录 — 密码门禁" loading="lazy">
+          <div class="screenshot-caption">
+            <span class="caption-title">管理门禁 · 登录验证</span>
+            <span class="caption-desc">密码保护后台入口</span>
+          </div>
+        </div>
+        <div class="screenshot-item">
+          <img src="screenshot-admin-dashboard.png" alt="MarketPulse 管理后台 — 发稿/订阅源/草稿" loading="lazy">
+          <div class="screenshot-caption">
+            <span class="caption-title">管理后台 · 发稿中心</span>
+            <span class="caption-desc">手动发稿 + 文档导入 + 订阅源管理</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="screenshot-item">
+        <img src="screenshot-search.png" alt="MarketPulse 搜索页 — 全文搜索 + 多维筛选" loading="lazy">
+        <div class="screenshot-caption">
+          <span class="caption-title">搜索 · 全文检索</span>
+          <span class="caption-desc">毫秒级搜索 + 多维筛选 + 热搜推荐</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+  <div class="container">
+    <div class="features-label">Core Features</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <h4>多源 RSS 自动抓取</h4>
+        <p>内置东方财富、华尔街见闻、中新财经、36氪四大源，CORS 代理三级降级策略，支持自定义添加。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✍️</div>
+        <h4>发稿后台管理</h4>
+        <p>手动发稿、Markdown/TXT/JSON 文档批量导入、草稿队列管理，密码保护安全入口。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h4>全文搜索与筛选</h4>
+        <p>标题+摘要+来源全文检索，按标签、订阅源、状态多维筛选，毫秒级响应。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💾</div>
+        <h4>IndexedDB 持久化</h4>
+        <p>所有文章与配置本地持久存储，Dexie.js 驱动，零云端依赖，刷新不丢失。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h4>行情数据条</h4>
+        <p>上证指数、深证成指、沪深300、创业板指、纳斯达克、BTC 实时模拟，5秒自动刷新。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌙</div>
+        <h4>深蓝夜色终端</h4>
+        <p>深蓝底色 + 琥珀金强调色，致敬彭博终端 / Palantir 风格，专业财经视觉体验。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏷️</div>
+        <h4>标签聚合与分类</h4>
+        <p>公告/研报/监管/市场分类筛选，标签云聚合页，一键定位关联资讯。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h4>响应式移动适配</h4>
+        <p>桌面与移动端自适应布局，底部 Tab 导航，触摸手势支持，随时随地查阅。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h4>纯前端零后端</h4>
+        <p>Vue 3 SPA，全部数据存储在浏览器本地，无需服务器，无数据上传，隐私绝对安全。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="tech-section">
+  <div class="container">
+    <div class="tech-label">Tech Stack</div>
+    <div class="tech-stack">
+      <span>Vue 3</span>
+      <span>Vite</span>
+      <span>Pinia</span>
+      <span>Vue Router</span>
+      <span>Dexie.js</span>
+      <span>IndexedDB</span>
+      <span>Hash Router</span>
+      <span>CORS Proxy</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / Contact -->
+<section class="cta-section" id="contact">
+  <div class="container">
+    <h2>对 Yyan · MarketPulse 感兴趣？</h2>
+    <p>
+      产品目前处于开发迭代阶段，仅展示介绍与截图作为宣传。<br>
+      如果您对本产品感兴趣或有合作意向，欢迎留言，我们会尽快与您联系。
+    </p>
+    <div class="cta-box">
+      💬 感兴趣者欢迎留言 · GitHub Issues / Discussions
+    </div>
+    <div style="margin-top: 16px;">
+      <a href="https://github.com/superwangying" class="btn-secondary" style="display: inline-flex;">
+        Visit GitHub →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>© 2026 SuperWangYing</p>
+    <div class="footer-links">
+      <a href="https://github.com/superwangying">GitHub</a>
+      <a href="/">Home</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Theme Toggle -->
+<script>
+  const themeBtn = document.getElementById('themeBtn');
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    themeBtn.textContent = t === 'dark' ? '□' : '■';
+  }
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+</script>
+
+</body>
+</html>

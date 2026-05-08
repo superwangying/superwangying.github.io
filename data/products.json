@@ -231,6 +231,44 @@
       "order": 3
     },
     {
+      "id": "yyan",
+      "name": "Yyan · MarketPulse",
+      "tagline": "专业财经资讯聚合终端，深蓝夜色致敬彭博",
+      "description": "面向财经从业者的纯前端资讯聚合与发布平台。自动抓取多源 RSS（东方财富、华尔街见闻、中新财经、36氪），IndexedDB 持久化存储，发稿后台管理，全文搜索与多维筛选。深蓝夜色 + 琥珀金强调色终端风格，致敬彭博终端美学。纯前端零后端，数据完全本地。感兴趣者欢迎留言。",
+      "category": "webapps",
+      "icon": "📈",
+      "cover": "",
+      "features": [
+        "多源 RSS 抓取：内置东方财富、华尔街见闻、中新财经、36氪四大源，CORS 代理三级降级",
+        "发稿后台：手动发稿 + Markdown/TXT/JSON 文档批量导入 + 草稿队列管理",
+        "管理门禁：密码保护后台入口，安全可控",
+        "全文搜索：标题 + 摘要 + 来源全文检索，毫秒级响应",
+        "多维筛选：按标签、订阅源、状态精确过滤",
+        "IndexedDB 持久化：Dexie.js 驱动，零云端依赖，刷新不丢失",
+        "行情数据条：上证指数、深证成指、纳斯达克、BTC 实时模拟，5秒刷新",
+        "深蓝夜色终端：深蓝底色 + 琥珀金强调色，致敬彭博终端 / Palantir 风格",
+        "标签聚合：分类筛选 + 标签云 + 一键定位关联资讯",
+        "响应式移动适配：桌面与移动端自适应，底部 Tab 导航 + 触摸手势"
+      ],
+      "highlights": [
+        "纯前端零后端，数据完全本地",
+        "深蓝夜色财经终端风格",
+        "多源 RSS + 发稿后台 + 全文搜索",
+        "感兴趣者欢迎留言"
+      ],
+      "tech": ["Vue 3", "Vite", "Pinia", "Vue Router", "Dexie.js", "IndexedDB", "Hash Router"],
+      "status": "开发中",
+      "links": {
+        "demo": "https://superwangying.github.io/products/yyan/",
+        "github": "https://github.com/superwangying"
+      },
+      "githubRepo": "superwangying.github.io",
+      "stars": 0,
+      "version": "1.0.0",
+      "updateDate": "2026-05-08",
+      "order": 0
+    },
+    {
       "id": "welcome",
       "name": "更多产品即将上线",
       "tagline": "持续构建中，敬请期待",
