@@ -257,7 +257,7 @@
         "感兴趣者欢迎留言"
       ],
       "tech": ["Vue 3", "Vite", "Pinia", "Vue Router", "Dexie.js", "IndexedDB", "Hash Router"],
-      "status": "开发中",
+      "status": "活跃开发",
       "links": {
         "demo": "https://superwangying.github.io/products/yyan/",
         "github": "https://github.com/superwangying"
