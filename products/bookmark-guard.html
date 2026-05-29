@@ -4147,7 +4147,7 @@
       if (body) opts.body = JSON.stringify(body);
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       opts.signal = controller.signal;
 
       try {
@@ -4224,9 +4224,7 @@
         let content = file.content;
         // GitHub truncates large files (>1MB); fetch raw content if needed
         if (file.truncated || !content || content.length < 100) {
-          const rawRes = await fetch(file.raw_url, {
-            headers: { 'Authorization': `token ${syncConfig.token || document.getElementById('github-token').value.trim()}` }
-          });
+          const rawRes = await fetch(file.raw_url);
           if (!rawRes.ok) throw new Error('无法获取完整文件内容');
           content = await rawRes.text();
         }
