@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xcaij · DesignDistill — 网页设计规范引擎</title>
+<meta name="description" content="AI 驱动的网页设计采集与规范编译平台，Playwright 全量采集 + Spec Compiler 零损耗编译 + 多格式导出，将任意网页转化为结构化设计规范。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #ffffff;
+  --bg-secondary: #fafafa;
+  --fg: #000000;
+  --fg-secondary: #222222;
+  --fg-muted: #666666;
+  --border: #e5e5e5;
+  --accent: #000000;
+  --card-hover: #f5f5f5;
+  --pill-bg: #f0f0f0;
+  --pill-fg: #333333;
+  --code-bg: #f5f5f5;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --teal: #0d9488;
+  --teal-light: #ccfbf1;
+}
+
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --bg-secondary: #111111;
+  --fg: #e8e8e8;
+  --fg-secondary: #cccccc;
+  --fg-muted: #999999;
+  --border: #1a1a1a;
+  --accent: #ffffff;
+  --card-hover: #1a1a1a;
+  --pill-bg: #1e1e1e;
+  --pill-fg: #bbbbbb;
+  --code-bg: #161616;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+  --teal: #2dd4bf;
+  --teal-light: #0a2926;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.2s, color 0.2s;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===== Nav ===== */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s, border-color 0.2s;
+}
+.nav .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+.nav-logo {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+.nav-logo:hover { color: var(--fg); }
+.nav-logo .logo-icon { font-size: 18px; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--fg);
+  transition: background 0.15s, border-color 0.15s;
+}
+.nav-btn:hover { background: var(--bg-secondary); }
+.nav-link {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--fg-muted);
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.15s;
+}
+.nav-link:hover { color: var(--fg); background: var(--bg-secondary); }
+
+/* ===== Hero ===== */
+.hero {
+  padding: 80px 0 48px;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  margin-bottom: 24px;
+}
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+.hero h1 {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero h1 .accent { color: var(--teal); }
+.hero .subtitle {
+  font-size: 15px;
+  color: var(--fg-secondary);
+  max-width: 600px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+.hero-tags {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.hero-tags span {
+  font-size: 11px;
+  color: var(--pill-fg);
+  background: var(--pill-bg);
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-secondary:hover { background: var(--bg-secondary); }
+
+/* ===== Screenshots ===== */
+.screenshots {
+  padding: 32px 0 64px;
+}
+.screenshots-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+.screenshot-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.screenshot-item:hover {
+  box-shadow: var(--shadow-lg);
+}
+.screenshot-item img {
+  width: 100%;
+  display: block;
+}
+.screenshot-caption {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.screenshot-caption .caption-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+.screenshot-caption .caption-desc {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+/* Dual screenshot row */
+.screenshot-dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ===== Features ===== */
+.features {
+  padding: 64px 0;
+  border-top: 1px solid var(--border);
+}
+.features-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.feature-card {
+  background: var(--bg);
+  padding: 24px;
+  transition: background 0.15s;
+}
+.feature-card:hover { background: var(--bg-secondary); }
+.feature-icon {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+.feature-card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.feature-card p {
+  font-size: 12px;
+  color: var(--fg-secondary);
+  line-height: 1.6;
+}
+
+/* ===== Tech Stack ===== */
+.tech-section {
+  padding: 48px 0 64px;
+  border-top: 1px solid var(--border);
+}
+.tech-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 16px;
+}
+.tech-stack {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tech-stack span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pill-fg);
+  background: var(--pill-bg);
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* ===== CTA / Contact ===== */
+.cta-section {
+  padding: 64px 0 80px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.cta-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+.cta-section p {
+  font-size: 14px;
+  color: var(--fg-secondary);
+  max-width: 520px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+.cta-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 1px solid var(--teal);
+  background: var(--teal-light);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+/* ===== Footer ===== */
+.footer {
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer p { font-size: 11px; color: var(--fg-muted); }
+.footer-links { display: flex; gap: 16px; }
+.footer-links a {
+  font-size: 11px;
+  color: var(--fg-muted);
+  transition: color 0.15s;
+}
+.footer-links a:hover { color: var(--fg); }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 28px; }
+  .hero .subtitle { font-size: 13px; }
+  .screenshot-dual {
+    grid-template-columns: 1fr;
+  }
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  .container { padding: 0 16px; }
+  .hero { padding: 56px 0 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="container">
+    <a href="/" class="nav-logo">
+      <span class="logo-icon">◆</span> SuperWangYing
+    </a>
+    <div class="nav-actions">
+      <a href="/#products" class="nav-link">← All Products</a>
+      <button class="nav-btn" id="themeBtn" aria-label="Toggle theme">■</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Preview · LIVE
+    </div>
+    <h1>Xcaij · <span class="accent">DesignDistill</span></h1>
+    <p class="subtitle">
+      AI 驱动的网页设计采集与规范编译平台。<br>
+      Playwright 全量采集 → Spec Compiler 零损耗编译 → 多格式导出，<br>
+      将任意高质量网页转化为结构化设计规范，供设计师、开发者和 AI IDE 直接消费。
+    </p>
+    <div class="hero-tags">
+      <span>设计规范引擎</span>
+      <span>Playwright 采集</span>
+      <span>零损耗编译</span>
+      <span>多格式导出</span>
+      <span>AI IDE 友好</span>
+      <span>MCP 协议</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#screenshots" class="btn-primary">View Screenshots ↓</a>
+      <a href="#contact" class="btn-secondary">Leave a Message</a>
+    </div>
+  </div>
+</section>
+
+<!-- Screenshots -->
+<section class="screenshots" id="screenshots">
+  <div class="container">
+    <div class="screenshots-label">Product Screenshots</div>
+
+    <!-- Console -->
+    <div class="screenshot-grid">
+      <div class="screenshot-item">
+        <img src="screenshot-console.png" alt="DesignDistill 控制台 — URL 输入 + 引擎状态" loading="lazy">
+        <div class="screenshot-caption">
+          <span class="caption-title">控制台 · 设计规范控制台</span>
+          <span class="caption-desc">URL 输入 + 引擎状态 + 采集模式选择</span>
+        </div>
+      </div>
+
+      <!-- Spec Browser + Export (dual) -->
+      <div class="screenshot-dual">
+        <div class="screenshot-item">
+          <img src="screenshot-spec-browser.png" alt="DesignDistill 设计规范浏览器 — 品牌/令牌/组件概览" loading="lazy">
+          <div class="screenshot-caption">
+            <span class="caption-title">规范浏览器 · 品牌概览</span>
+            <span class="caption-desc">组件/令牌/截图/指南六 Tab 浏览</span>
+          </div>
+        </div>
+        <div class="screenshot-item">
+          <img src="screenshot-components.png" alt="DesignDistill 组件目录 — 语义化组件 + 截图 + 样式" loading="lazy">
+          <div class="screenshot-caption">
+            <span class="caption-title">组件目录 · 语义化拆解</span>
+            <span class="caption-desc">组件截图 + HTML 源码 + 计算样式</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Center -->
+      <div class="screenshot-item">
+        <img src="screenshot-export-center.png" alt="DesignDistill 导出中心 — 多格式导出 + AI IDE 一键包" loading="lazy">
+        <div class="screenshot-caption">
+          <span class="caption-title">导出中心 · 多格式交付</span>
+          <span class="caption-desc">HTML/Tokens/Tailwind + AI IDE 规则 + Storybook + 提示词模板</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+  <div class="container">
+    <div class="features-label">Core Features</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h4>Playwright 全量采集</h4>
+        <p>全页截图 + 视口截图 + 组件级截图，Shadow DOM 穿透、交互状态追踪，649KB+ 丰富 DSL 原始数据。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚙️</div>
+        <h4>Spec Compiler 零损耗编译</h4>
+        <p>将原始 DSL 编译为结构化 Design Specification，程序化提取 links/images/headings，保留完整 HTML 片段，零数据损耗。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h4>多格式导出</h4>
+        <p>HTML 样例、Design Tokens JSON、CSS/Tailwind 配置、Storybook Stories，每种格式独立 Exporter 可插拔。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h4>AI IDE 友好导出</h4>
+        <p>一键生成 .trae/rules、.cursorrules、CLAUDE.md、AGENTS.md 规则文件，AI IDE 自动按设计系统开发。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h4>Design Tokens 提取</h4>
+        <p>颜色、排版、间距、圆角、阴影、断点六大令牌类型，Style Dictionary 兼容，可转 CSS/iOS/Android。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">☁️</div>
+        <h4>WebDAV / Gitee 云同步</h4>
+        <p>支持坚果云、Nextcloud、Seafile 等 WebDAV 服务及 Gitee 仓库双向同步，凭证持久化到磁盘。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔌</div>
+        <h4>MCP 协议支持</h4>
+        <p>Model Context Protocol 进程管理，支持 VS Code、Cursor、Windsurf、Claude Desktop 等 IDE 接入。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h4>设计规范浏览器</h4>
+        <p>六 Tab 浏览（品牌/令牌/组件/截图/指南/导出），ComponentCard 截图 + 内容预览 + 可折叠 HTML/样式。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h4>全栈 TypeScript + TDD</h4>
+        <p>Node.js + React 全栈 TypeScript，51+ 单元测试用例，vitest TDD 开发，CI/CD 完整流水线。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="tech-section">
+  <div class="container">
+    <div class="tech-label">Tech Stack</div>
+    <div class="tech-stack">
+      <span>Node.js</span>
+      <span>TypeScript</span>
+      <span>Express</span>
+      <span>React</span>
+      <span>Vite</span>
+      <span>Playwright</span>
+      <span>Tailwind CSS</span>
+      <span>Zustand</span>
+      <span>Vitest</span>
+      <span>Docker</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / Contact -->
+<section class="cta-section" id="contact">
+  <div class="container">
+    <h2>对 Xcaij · DesignDistill 感兴趣？</h2>
+    <p>
+      产品目前为已完成成品（非开源发布），仅展示介绍与截图作为宣传。<br>
+      如果您对本产品感兴趣或有合作意向，欢迎留言，我们会尽快与您联系。
+    </p>
+    <div class="cta-box">
+      💬 感兴趣者欢迎留言 · GitHub Issues / Discussions
+    </div>
+    <div style="margin-top: 16px;">
+      <a href="https://github.com/superwangying" class="btn-secondary" style="display: inline-flex;">
+        Visit GitHub →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>© 2026 SuperWangYing</p>
+    <div class="footer-links">
+      <a href="https://github.com/superwangying">GitHub</a>
+      <a href="/">Home</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Theme Toggle -->
+<script>
+  const themeBtn = document.getElementById('themeBtn');
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    themeBtn.textContent = t === 'dark' ? '□' : '■';
+  }
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+</script>
+
+</body>
+</html>

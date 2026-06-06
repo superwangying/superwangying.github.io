@@ -362,6 +362,53 @@
                          "order":  1
                      },
                      {
+                         "id":  "xcaij",
+                         "name":  "Xcaij · DesignDistill",
+                         "tagline":  "网页设计规范引擎，从任意网页提取高保真设计规范",
+                         "description":  "AI 驱动的网页设计采集与规范编译平台。Playwright 全量采集（全页截图 + 视口截图 + 组件级截图）→ Spec Compiler 零损耗编译（DSL → 结构化 Design Specification）→ 多格式导出（HTML/Tokens/Tailwind/AI IDE 规则/Storybook/提示词模板），将任意高质量网页转化为结构化设计规范，供设计师、开发者和 AI IDE 直接消费。支持 WebDAV/Gitee 云同步、MCP 协议接入、CLI 工具及 REST API。",
+                         "category":  "tools",
+                         "icon":  "🎨",
+                         "cover":  "",
+                         "features":  [
+                                          "Playwright 全量采集：全页截图 + 视口截图 + 组件级截图，Shadow DOM 穿透，649KB+ DSL 数据",
+                                          "Spec Compiler 零损耗编译：DSL → 结构化 Design Specification，程序化提取 links/images/headings",
+                                          "多格式导出：HTML 样例、Design Tokens JSON、CSS/Tailwind 配置，每种格式独立 Exporter",
+                                          "AI IDE 友好：一键生成 .trae/rules、.cursorrules、CLAUDE.md、AGENTS.md 规则文件",
+                                          "Storybook Stories：CSF3 格式 stories.tsx，AI 从 argTypes 推断组件 API",
+                                          "Design Tokens：颜色/排版/间距/圆角/阴影/断点六大令牌，Style Dictionary 兼容",
+                                          "WebDAV 云同步：坚果云、Nextcloud、Seafile 等 WebDAV 服务双向同步",
+                                          "MCP 协议：VS Code、Cursor、Windsurf、Claude Desktop 等 IDE 接入",
+                                          "Gitee 仓库同步：Token 认证，推送/拉取双向同步",
+                                          "全栈 TypeScript + Vitest TDD，51+ 单元测试用例，CI/CD 完整流水线"
+                                      ],
+                         "highlights":  [
+                                            "Playwright 全量采集 + Spec Compiler 零损耗编译",
+                                            "AI IDE 友好导出，一键生成多 IDE 规则文件",
+                                            "WebDAV/Gitee 云同步 + MCP 协议接入",
+                                            "全栈 TypeScript + TDD + Docker 部署"
+                                        ],
+                         "tech":  [
+                                      "Node.js",
+                                      "TypeScript",
+                                      "Express",
+                                      "React",
+                                      "Vite",
+                                      "Playwright",
+                                      "Tailwind CSS",
+                                      "Zustand"
+                                  ],
+                         "status":  "活跃开发",
+                         "links":  {
+                                       "demo":  "https://superwangying.github.io/products/xcaij/",
+                                       "github":  "https://github.com/superwangying"
+                                   },
+                         "githubRepo":  "superwangying.github.io",
+                         "stars":  0,
+                         "version":  "1.0.0",
+                         "updateDate":  "2026-06-06",
+                         "order":  0
+                     },
+                     {
                          "id":  "welcome",
                          "name":  "更多产品即将上线",
                          "tagline":  "持续构建中，敬请期待",
