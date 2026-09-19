@@ -29,6 +29,9 @@ export default defineConfig({
     },
   },
   build: {
+    // 禁用 modulepreload，避免 Chrome 扩展 popup/options 页面出现
+    // "cross-world extension resource mismatch" 警告
+    modulePreload: false,
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'popup.html'),
