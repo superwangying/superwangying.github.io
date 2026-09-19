@@ -128,9 +128,9 @@
                          "status":  "活跃开发",
                          "links":  {
                                        "demo":  "https://superwangying.github.io/products/agentkit/",
-                                       "github":  "https://github.com/superwangying"
+                                       "github":  "https://github.com/superwangying/agentkit"
                                    },
-                         "githubRepo":  "superwangying.github.io",
+                         "githubRepo":  "agentkit",
                          "stars":  0,
                          "version":  "2.0.0",
                          "updateDate":  "2026-09-19",
