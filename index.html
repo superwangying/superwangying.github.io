@@ -279,7 +279,7 @@
           <div class="stat-label">Product Visits</div>
         </div>
         <div class="stat-item">
-          <div class="stat-value" id="totalStars">0</div>
+          <div class="stat-value" id="totalStars" title="GitHub stars across all public repos of @superwangying — live data from the GitHub API, not a hardcoded number">—</div>
           <div class="stat-label">Total Stars</div>
         </div>
         <div class="stat-item">
@@ -338,6 +338,7 @@
         renderProducts(validProducts);
         updateStats(validProducts);
         loadVisits();
+        loadStars();
       } catch (error) {
         console.error('Failed to load products:', error);
       }
@@ -381,15 +382,15 @@
       });
     }
 
-    // 更新统计栏
+    // 更新统计栏（产品数）
+    // 注意：Total Stars 不在此处计算 —— 它来自 GitHub 实时数据（见 loadStars），
+    //      不再是 products.json 里写死的 stars 字段求和
     function updateStats(products) {
       const liveCount = products.filter(p =>
         p.status === '活跃开发' || p.status === 'Live'
       ).length;
-      const totalStars = products.reduce((sum, p) => sum + (p.stars || 0), 0);
 
       document.getElementById('liveCount').textContent = liveCount;
-      document.getElementById('totalStars').textContent = totalStars;
     }
 
     /* ==========================================================
@@ -428,6 +429,71 @@
         .then(res => (res.ok ? res.json() : null))
         .then(data => { if (data) renderVisits(Number(data.value) || 0); })
         .catch(() => {});
+    }
+
+    /* ==========================================================
+       Total Stars：真实计数
+       —— 口径：@superwangying 名下全部公开仓库的 stargazers_count 之和
+       —— 数据源：GitHub REST API（实时拉取，非 products.json 里的写死字段）
+       —— 缓存：localStorage 6 小时，规避未授权 60 次/小时的限流
+       —— 容错：接口不可用时回落到上次真实缓存值（tooltip 标注 cached），
+          无缓存则显示 “—”，绝不显示假数字
+       ========================================================== */
+    const GH_USER = 'superwangying';
+    const GH_STARS_CACHE = 'gh-stars-v1';
+    const GH_STARS_TTL = 6 * 60 * 60 * 1000; // 6h
+
+    function renderStars(value, stale) {
+      const el = document.getElementById('totalStars');
+      if (!el) return;
+      if (value === null || value === undefined) {
+        el.textContent = '—';
+        return;
+      }
+      el.textContent = Number(value).toLocaleString('en-US');
+      el.title = stale
+        ? 'GitHub stars across all public repos of @superwangying — cached value (API temporarily unavailable)'
+        : 'GitHub stars across all public repos of @superwangying — live from the GitHub API';
+    }
+
+    function readStarsCache() {
+      try {
+        const raw = localStorage.getItem(GH_STARS_CACHE);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        return typeof obj?.value === 'number' ? obj : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function loadStars() {
+      const cached = readStarsCache();
+      if (cached && Date.now() - cached.ts < GH_STARS_TTL) {
+        renderStars(cached.value, false);
+        return;
+      }
+
+      try {
+        // 不带自定义 header，避免触发 CORS 预检；GitHub 返回 ACAO:*
+        const res = await fetch(
+          `https://api.github.com/users/${GH_USER}/repos?per_page=100&type=owner`,
+          { cache: 'no-store' }
+        );
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const repos = await res.json();
+        if (!Array.isArray(repos)) throw new Error('bad payload');
+
+        const total = repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
+        try {
+          localStorage.setItem(GH_STARS_CACHE, JSON.stringify({ value: total, ts: Date.now() }));
+        } catch (e) { /* localStorage 不可用时忽略 */ }
+        renderStars(total, false);
+      } catch (err) {
+        // 优先用上次的真实缓存值，其次显示 —
+        if (cached) renderStars(cached.value, true);
+        else renderStars(null);
+      }
     }
 
     // 页面加载时执行
