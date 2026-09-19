@@ -96,13 +96,13 @@
                      {
                          "id":  "agentkit",
                          "name":  "AgentKit · AI 代理工具包",
-                         "tagline":  "193 专业 AI Agent，任何环境即插即用",
-                         "description":  "便携式 193 专业 AI 代理系统，纯 Markdown 代理库，覆盖 14 大分类领域。零依赖、平台无关，支持 CLI 查询、复制粘贴、文件引用等多种使用方式，可在任何 AI 环境中即插即用。",
+                         "tagline":  "435 专业 AI Agent，任何环境即插即用",
+                         "description":  "便携式 435 专业 AI 代理系统，纯 Markdown 代理库，覆盖 14 大分类领域。零依赖、平台无关，支持 CLI 查询、复制粘贴、文件引用等多种使用方式，可在任何 AI 环境中即插即用。",
                          "category":  "tools",
                          "icon":  "🤖",
                          "cover":  "",
                          "features":  [
-                                          "193 个专业 Agent：覆盖编程语言、框架、DevOps、安全、数据AI等 14 大领域",
+                                          "435 个专业 Agent：覆盖编程语言、框架、DevOps、安全、数据AI/营销增长/医疗/GIS 等 14 大领域",
                                           "CLI 工具：npx agentkit find/get/list/search 快速检索",
                                           "零依赖运行：纯 Markdown 文件，Node.js ≥ 16 即可",
                                           "平台无关：适用于 Claude、ChatGPT、Cursor、Copilot 等任何 AI 环境",
@@ -114,7 +114,7 @@
                                           "持续更新：社区驱动，持续扩充 Agent 库"
                                       ],
                          "highlights":  [
-                                            "193 个专业 Agent，14 大分类领域",
+                                            "435 个专业 Agent，14 大分类领域",
                                             "零依赖纯 Markdown，即插即用",
                                             "平台无关，兼容所有 AI 环境",
                                             "内置 CLI 工具，命令行快速检索"
@@ -132,8 +132,8 @@
                                    },
                          "githubRepo":  "superwangying.github.io",
                          "stars":  0,
-                         "version":  "1.1.0",
-                         "updateDate":  "2026-04-28",
+                         "version":  "2.0.0",
+                         "updateDate":  "2026-09-19",
                          "order":  1
                      },
                      {
