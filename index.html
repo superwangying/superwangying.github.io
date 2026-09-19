@@ -275,8 +275,8 @@
           <div class="stat-label">Live Products</div>
         </div>
         <div class="stat-item">
-          <div class="stat-value" id="devCount">0</div>
-          <div class="stat-label">In Development</div>
+          <div class="stat-value" id="visitCount" title="Accumulated product visits — real server-side count (public counter)">—</div>
+          <div class="stat-label">Product Visits</div>
         </div>
         <div class="stat-item">
           <div class="stat-value" id="totalStars">0</div>
@@ -337,6 +337,7 @@
 
         renderProducts(validProducts);
         updateStats(validProducts);
+        loadVisits();
       } catch (error) {
         console.error('Failed to load products:', error);
       }
@@ -352,6 +353,8 @@
         if (product.links?.demo) {
           card.href = product.links.demo;
           card.className = 'product-card';
+          // 真实计数：从首页进入产品即 +1
+          card.addEventListener('click', countVisit);
         } else {
           card.className = 'product-card';
         }
@@ -383,14 +386,48 @@
       const liveCount = products.filter(p =>
         p.status === '活跃开发' || p.status === 'Live'
       ).length;
-      const devCount = products.filter(p =>
-        p.status !== '活跃开发' && p.status !== 'Live'
-      ).length;
       const totalStars = products.reduce((sum, p) => sum + (p.stars || 0), 0);
 
       document.getElementById('liveCount').textContent = liveCount;
-      document.getElementById('devCount').textContent = devCount;
       document.getElementById('totalStars').textContent = totalStars;
+    }
+
+    /* ==========================================================
+       产品访问量：真实计数
+       —— 口径：每从首页点击进入一次产品，累计 +1（含重复进入）
+       —— 数据源：免费公开计数器 Abacus（Cloudflare Workers KV），
+          数值由服务端累计，非前端估算、非写死
+       —— 隐私：不写 cookie、不做用户标识
+       —— 容错：计数服务不可用时显示 “—”，绝不显示假数字
+       ========================================================== */
+    const COUNTER_API = 'https://abacus.jasoncameron.dev';
+    const COUNTER_NS = 'superwangying-site';
+    const COUNTER_KEY = 'product-visits';
+
+    function renderVisits(value) {
+      const el = document.getElementById('visitCount');
+      if (!el) return;
+      el.textContent = value === null ? '—' : Number(value).toLocaleString('en-US');
+    }
+
+    // 读取当前累计值
+    async function loadVisits() {
+      try {
+        const res = await fetch(`${COUNTER_API}/get/${COUNTER_NS}/${COUNTER_KEY}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        renderVisits(Number(data.value) || 0);
+      } catch (err) {
+        renderVisits(null);
+      }
+    }
+
+    // 计数 +1；keepalive 保证跳转离开首页后请求仍能送达
+    function countVisit() {
+      fetch(`${COUNTER_API}/hit/${COUNTER_NS}/${COUNTER_KEY}`, { cache: 'no-store', keepalive: true })
+        .then(res => (res.ok ? res.json() : null))
+        .then(data => { if (data) renderVisits(Number(data.value) || 0); })
+        .catch(() => {});
     }
 
     // 页面加载时执行
