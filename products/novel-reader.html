@@ -23,6 +23,7 @@
   --sidebar-bg: #FFFFFF;
   --dropzone-bg: rgba(196,149,106,0.06);
   --dropzone-border: rgba(196,149,106,0.3);
+  --loading-backdrop: rgba(250,250,248,0.82);
   --scrollbar-thumb: #D0CEC8;
   --scrollbar-track: transparent;
   --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
@@ -49,6 +50,7 @@
   --sidebar-bg: #222228;
   --dropzone-bg: rgba(212,165,116,0.06);
   --dropzone-border: rgba(212,165,116,0.3);
+  --loading-backdrop: rgba(26,26,30,0.86);
   --scrollbar-thumb: #4A4A52;
 }
 
@@ -68,6 +70,7 @@
   --sidebar-bg: #FAF5EC;
   --dropzone-bg: rgba(139,107,74,0.06);
   --dropzone-border: rgba(139,107,74,0.3);
+  --loading-backdrop: rgba(245,237,224,0.86);
   --scrollbar-thumb: #C8BBAA;
 }
 
@@ -87,6 +90,7 @@
   --sidebar-bg: #F5F8F2;
   --dropzone-bg: rgba(107,143,94,0.06);
   --dropzone-border: rgba(107,143,94,0.3);
+  --loading-backdrop: rgba(239,243,235,0.86);
   --scrollbar-thumb: #B0BBA8;
 }
 
@@ -271,6 +275,9 @@ body {
   font-size: 14px;
   color: var(--text-secondary);
   position: relative;
+  /* 关掉文字选择，否则按下拖动会优先进入"拖选文字"而不是启动拖拽 */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .chapter-item:hover {
@@ -295,6 +302,27 @@ body {
   background: var(--accent);
   border-radius: 0 3px 3px 0;
 }
+
+/* 正在被拖起的源节点 */
+.chapter-item.dragging {
+  opacity: 0.4;
+}
+
+/* 拖拽重排时的插入位置指示线 */
+.chapter-item.drop-before::after,
+.chapter-item.drop-after::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.chapter-item.drop-before::after { top: -3px; }
+.chapter-item.drop-after::after { bottom: -3px; }
 
 .chapter-item .chapter-index {
   font-size: 11px;
@@ -485,6 +513,13 @@ body {
   justify-content: center;
   padding: 40px 20px 80px;
   scroll-behavior: smooth;
+  transition: background var(--transition);
+}
+
+/* 从目录树拖章节节点进来时的落点提示 */
+.reading-area.internal-drop {
+  background: var(--dropzone-bg);
+  box-shadow: inset 0 0 0 2px var(--dropzone-border);
 }
 
 .reading-content {
@@ -670,6 +705,10 @@ body {
   align-items: center;
   justify-content: center;
   animation: overlayIn 0.2s ease;
+  /* 关键：遮罩是覆盖全屏的顶层元素，必须让它对指针完全透明。
+     否则它会在 dragenter 时盖到指针下方、抢走拖拽目标，
+     浏览器随即把 dropEffect 重置为 none —— 这就是"禁止拖拽"图标的来源。 */
+  pointer-events: none;
 }
 
 .drag-overlay.show { display: flex; }
@@ -701,6 +740,79 @@ body {
 .drag-overlay-content p {
   font-size: 14px;
   opacity: 0.7;
+}
+
+/* ========== Loading Progress ========== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--loading-backdrop);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: overlayIn 0.25s ease;
+  /* 纯提示层：不吃指针事件，永远不可能抢走拖拽目标 */
+  pointer-events: none;
+}
+
+.loading-overlay.show { display: flex; }
+
+.loading-card {
+  width: min(340px, calc(100vw - 64px));
+  padding: 26px 30px 22px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-card);
+  box-shadow: 0 12px 40px var(--shadow-lg);
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.loading-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.loading-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  min-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-track {
+  height: 6px;
+  margin: 16px 0 2px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  transition: width 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 无量化进度的阶段：柔和呼吸，而不是生硬地跳格 */
+.progress-fill.pulse {
+  animation: progressPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 /* ========== Bottom Bar ========== */
@@ -753,7 +865,7 @@ body {
   border: 1px solid var(--border);
   opacity: 0;
   transition: all 0.3s ease;
-  z-index: 200;
+  z-index: 1300;
   pointer-events: none;
 }
 
@@ -965,6 +1077,17 @@ body {
   </div>
 </div>
 
+<!-- Loading Progress -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-card">
+    <div class="loading-title" id="loadingTitle">正在载入…</div>
+    <div class="loading-sub" id="loadingSub">准备中</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -983,6 +1106,8 @@ body {
     theme: 'light',
     fontSize: 17,
     sidebarOpen: window.innerWidth > 768,
+    dragIndex: -1,      // 正在被拖拽的章节节点下标，-1 表示没有内部拖拽
+    loading: false,     // 是否正在解析书籍，防止重复载入
   };
 
   // ========== DOM Elements ==========
@@ -999,6 +1124,11 @@ body {
   const fontLabel = $('#fontLabel');
   const themeDropdown = $('#themeDropdown');
   const dragOverlay = $('#dragOverlay');
+  const dropzone = $('#dropzone');
+  const loadingOverlay = $('#loadingOverlay');
+  const loadingTitle = $('#loadingTitle');
+  const loadingSub = $('#loadingSub');
+  const progressFill = $('#progressFill');
   const toast = $('#toast');
   const folderInput = $('#folderInput');
   const fileInput = $('#fileInput');
@@ -1065,8 +1195,87 @@ body {
     saveSettings();
   }
 
+  // ========== Long-task Yielding ==========
+  // 让出一帧给浏览器渲染。大文件解析必须分片 + 让出主线程，
+  // 否则长任务会把主线程占死，浏览器弹出"此页面没有响应"。
+  function yieldToUI() {
+    return new Promise(resolve => {
+      if (document.hidden || typeof requestAnimationFrame !== 'function') {
+        setTimeout(resolve, 0);
+      } else {
+        requestAnimationFrame(() => setTimeout(resolve, 0));
+      }
+    });
+  }
+
+  function formatSize(bytes) {
+    if (typeof bytes !== 'number' || !isFinite(bytes) || bytes <= 0) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  // ========== Loading Progress ==========
+  // 柔和进度条：小文件不闪烁（延迟显示），大文件全程可见、只前进不后退。
+  const SHOW_DELAY = 140;     // 140ms 内完成的任务根本不弹进度条
+  const MIN_VISIBLE = 320;    // 一旦显示，至少停留这么久，避免一闪而过
+  const progress = (function () {
+    let shown = false;
+    let showTimer = null;
+    let shownAt = 0;
+    let value = 0;
+
+    return {
+      begin(title, sub) {
+        clearTimeout(showTimer);
+        value = 0;
+        shown = false;
+        loadingTitle.textContent = title;
+        loadingSub.textContent = sub || '准备中';
+        progressFill.classList.remove('pulse');
+        progressFill.style.width = '0%';
+        showTimer = setTimeout(() => {
+          shownAt = Date.now();
+          shown = true;
+          loadingOverlay.classList.add('show');
+        }, SHOW_DELAY);
+      },
+
+      // pct 为数字 → 确定性进度；为 null → 呼吸态（该阶段无法量化）
+      set(pct, sub) {
+        if (sub !== undefined) loadingSub.textContent = sub;
+        if (pct === null || pct === undefined) {
+          progressFill.classList.add('pulse');
+          return;
+        }
+        progressFill.classList.remove('pulse');
+        value = Math.max(value, Math.min(100, Math.round(pct)));
+        progressFill.style.width = value + '%';
+      },
+
+      async end() {
+        clearTimeout(showTimer);
+        if (shown) {
+          value = 100;
+          progressFill.classList.remove('pulse');
+          progressFill.style.width = '100%';
+          const wait = MIN_VISIBLE - (Date.now() - shownAt);
+          if (wait > 0) await new Promise(r => setTimeout(r, wait));
+        }
+        loadingOverlay.classList.remove('show');
+        shown = false;
+        value = 0;
+        progressFill.style.width = '0%';
+      },
+    };
+  })();
+
   // ========== File Handling ==========
-  function handleFiles(files) {
+  async function handleFiles(files) {
+    if (state.loading) {
+      showToast('正在载入上一本书，请稍候…');
+      return;
+    }
     const validFiles = Array.from(files).filter(f => {
       const ext = f.name.split('.').pop().toLowerCase();
       return ['txt', 'md', 'text', 'markdown'].includes(ext);
@@ -1080,24 +1289,220 @@ body {
     // Sort by name naturally
     validFiles.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN', { numeric: true }));
 
-    state.chapters = validFiles.map(f => {
+    state.loading = true;
+
+    // 如果只有 1 个文本文件，尝试自动按章节拆分
+    if (validFiles.length === 1) {
+      const f = validFiles[0];
       const ext = f.name.split('.').pop().toLowerCase();
-      const name = f.name.replace(/\.(txt|md|text|markdown)$/i, '');
-      return { name, file: f, ext: ext === 'markdown' ? 'md' : ext };
-    });
+      const bookName = f.name.replace(/\.(txt|md|text|markdown)$/i, '');
+      const normalizedExt = ext === 'markdown' ? 'md' : ext;
+      const sizeText = formatSize(f.size);
+      const suffix = sizeText ? ' · ' + sizeText : '';
 
-    renderChapterList();
+      progress.begin(`载入《${bookName}》`, '准备中…');
+      // 先让出一帧，让进度条真正画到屏幕上，再去干重活
+      await yieldToUI();
 
-    // Auto-select first chapter
-    if (state.chapters.length > 0) {
-      selectChapter(0);
-      showToast(`已加载 ${state.chapters.length} 个章节`);
+      try {
+        const text = await readFileAsText(f, (ratio) => {
+          progress.set(4 + ratio * 30, `读取文件 · ${Math.round(ratio * 100)}%`);
+        });
+
+        progress.set(null, '整理文本…');   // 这一段无法量化，走呼吸态
+        await yieldToUI();
+
+        const chapters = await parseChaptersFromText(text, bookName, normalizedExt, (p, sub) => {
+          progress.set(38 + p * 36, sub);
+        });
+
+        if (chapters && chapters.length >= 2) {
+          // 成功拆分成多个章节
+          state.chapters = chapters;
+          await renderChapterList((p, sub) => progress.set(74 + p * 24, sub));
+          progress.set(99, '打开第一章…');
+          if (!restoreProgress()) selectChapter(0);
+          showToast(`《${bookName}》已拆分 ${chapters.length} 个章节${suffix}`);
+        } else {
+          // 无法拆分或只有 1 章，降级为整本书当作一个章节
+          state.chapters = [{ name: bookName, file: f, ext: normalizedExt }];
+          await renderChapterList();
+          progress.set(99, '打开中…');
+          if (!restoreProgress()) selectChapter(0);
+          showToast(`已加载 ${state.chapters.length} 个章节${suffix}`);
+        }
+      } catch (err) {
+        console.error('读取文件失败', err);
+        state.chapters = [{ name: bookName, file: f, ext: normalizedExt }];
+        await renderChapterList();
+        if (!restoreProgress()) selectChapter(0);
+        showToast('文件读取失败，已按单章载入');
+      } finally {
+        await progress.end();
+        state.loading = false;
+      }
+      return;
+    }
+
+    // 多个文件：每个文件当作一个章节
+    progress.begin(`载入 ${validFiles.length} 个文件`, '生成目录…');
+    await yieldToUI();
+
+    try {
+      state.chapters = validFiles.map(f => {
+        const ext = f.name.split('.').pop().toLowerCase();
+        const name = f.name.replace(/\.(txt|md|text|markdown)$/i, '');
+        return { name, file: f, ext: ext === 'markdown' ? 'md' : ext };
+      });
+
+      await renderChapterList((p, sub) => progress.set(p * 96, sub));
+      progress.set(99, '打开第一章…');
+
+      // Auto-select first chapter
+      if (state.chapters.length > 0) {
+        if (!restoreProgress()) selectChapter(0);
+        showToast(`已加载 ${state.chapters.length} 个章节`);
+      }
+    } finally {
+      await progress.end();
+      state.loading = false;
     }
   }
 
-  function renderChapterList() {
-    // Remove old items (keep empty state)
-    chapterList.querySelectorAll('.chapter-item').forEach(el => el.remove());
+  // 用 Promise 包装 FileReader（可选上报读取进度）
+  function readFileAsText(file, onProgress) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = e => reject(e.target.error);
+      if (onProgress) {
+        reader.onprogress = (e) => {
+          if (e.lengthComputable && e.total > 0) onProgress(e.loaded / e.total);
+        };
+      }
+      reader.readAsText(file, 'UTF-8');
+    });
+  }
+
+  // 从纯文本中识别并拆分章节
+  //
+  // ⚠️ 不要回到「多行锚点 /^…$/m + while(re.exec(text))」的老写法。
+  //    那些正则都只有 m / im 而没有 g 标志；RegExp.prototype.exec 只在
+  //    global / sticky 时才读取并推进 lastIndex，所以非 global 的 exec
+  //    每次都从 0 重新匹配、永远返回同一个 match → while 循环永不退出，
+  //    主线程被占死，浏览器直接弹「此页面没有响应」。
+  //    改法：逐行扫描 + 行内锚定（不带 m 标志），天然线性、可中断、可上报进度。
+  const CHAPTER_LINE_PATTERNS = [
+    // 第 + 数字(中文/阿拉伯) + 章/节/回/卷/集/篇/部 + 可选冒号 + 可选标题
+    /^第\s*[0-9零一二三四五六七八九十百千万亿两〇]+\s*[章节回卷集篇部][ \t]*[:：]?[ \t]*.*$/,
+    // 序章 / 序言 / 楔子 / 引子 / 番外 / 外传 / 后记 / 尾声 / 终章 …
+    /^(?:序章|序言|楔子|引子|引章|番外|外传|后记|尾声|终章|序卷|正章)[ \t]*[:：]?[ \t]*.*$/,
+    // Chapter + 数字 + 标题（英文）
+    /^Chapter\s+\d+.*$/i,
+  ];
+  const MAX_TITLE_LINE = 200;   // 章节标题不可能这么长，超长行直接跳过（省掉大量无谓匹配）
+  const SCAN_YIELD_MS = 12;     // 连续计算超过这个毫秒数就让出主线程
+
+  async function parseChaptersFromText(text, bookName, ext, onProgress) {
+    if (!text || typeof text !== 'string') return null;
+
+    // 统一换行符
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    await yieldToUI();
+
+    // —— 阶段一：逐行扫描章节起始位置（可中断、可上报进度）——
+    const starts = [];
+    const len = normalized.length;
+    let i = 0, lines = 0, lastYield = Date.now();
+
+    while (i < len) {
+      let nl = normalized.indexOf('\n', i);
+      if (nl === -1) nl = len;
+
+      if (nl - i <= MAX_TITLE_LINE) {
+        const line = normalized.slice(i, nl).trim();
+        if (line.length >= 2) {
+          for (let k = 0; k < CHAPTER_LINE_PATTERNS.length; k++) {
+            if (CHAPTER_LINE_PATTERNS[k].test(line)) {
+              starts.push({ index: i, title: line });
+              break;
+            }
+          }
+        }
+      }
+
+      i = nl + 1;
+      lines++;
+      if ((lines & 255) === 0 && Date.now() - lastYield >= SCAN_YIELD_MS) {
+        if (onProgress) onProgress(0.5 * (i / len), `扫描章节标题 · 已找到 ${starts.length} 章`);
+        await yieldToUI();
+        lastYield = Date.now();
+      }
+    }
+
+    if (starts.length < 2) return null;   // 少于 2 个章节，不拆分
+
+    // —— 阶段二：按位置切分正文（同样分块让出主线程）——
+    const chapters = [];
+    let lastYield2 = Date.now();
+
+    for (let k = 0; k < starts.length; k++) {
+      const start = starts[k].index;
+      const end = k + 1 < starts.length ? starts[k + 1].index : len;
+      const content = normalized.slice(start, end).trim();
+
+      // 跳过太短的章节内容 —— 可能是误匹配
+      if (content.length >= 30 || chapters.length === 0) {
+        // 用 Blob 包装，让后续 selectChapter 逻辑无需改动
+        const blob = new Blob([content], { type: ext === 'md' ? 'text/markdown' : 'text/plain' });
+        chapters.push({ name: starts[k].title, file: blob, ext: ext });
+      }
+
+      if ((k & 127) === 0 && Date.now() - lastYield2 >= SCAN_YIELD_MS) {
+        if (onProgress) onProgress(0.5 + 0.5 * (k / starts.length), `切分章节 · ${k} / ${starts.length}`);
+        await yieldToUI();
+        lastYield2 = Date.now();
+      }
+    }
+
+    return chapters.length >= 2 ? chapters : null;
+  }
+
+  // 构造单个章节节点
+  function buildChapterItem(ch, i) {
+    const item = document.createElement('div');
+    item.className = 'chapter-item';
+    item.dataset.index = i;
+    item.draggable = true;   // 没有这一行，浏览器根本不会为节点发起拖拽
+
+    const idxEl = document.createElement('span');
+    idxEl.className = 'chapter-index';
+    idxEl.textContent = String(i + 1).padStart(2, '0');
+
+    // 用 textContent / 属性赋值而非 innerHTML 拼接：
+    // 文件名里若含引号或尖括号，不会再破坏 DOM 结构
+    const nameEl = document.createElement('span');
+    nameEl.className = 'chapter-name';
+    nameEl.title = ch.name;
+    nameEl.textContent = ch.name;
+
+    const extEl = document.createElement('span');
+    extEl.className = 'chapter-ext';
+    extEl.textContent = ch.ext;
+
+    item.append(idxEl, nameEl, extEl);
+
+    item.addEventListener('click', () => selectChapter(i));
+    item.addEventListener('dragstart', (e) => onChapterDragStart(e, i, item));
+    item.addEventListener('dragend', onChapterDragEnd);
+
+    return item;
+  }
+
+  // 分块渲染：像 2000+ 章的长篇，一次性插入上万个节点同样会卡住主线程
+  async function renderChapterList(onProgress) {
+    // 清掉旧节点与旧表头 —— 表头也必须清，否则每次加载都会把"共 N 章"再堆一层
+    chapterList.querySelectorAll('.chapter-item, .chapter-list-header').forEach(el => el.remove());
 
     if (state.chapters.length === 0) {
       chapterEmpty.style.display = 'flex';
@@ -1111,18 +1516,41 @@ body {
     header.textContent = `共 ${state.chapters.length} 章`;
     chapterList.insertBefore(header, chapterEmpty);
 
-    state.chapters.forEach((ch, i) => {
-      const item = document.createElement('div');
-      item.className = 'chapter-item';
-      item.dataset.index = i;
-      item.innerHTML = `
-        <span class="chapter-index">${String(i + 1).padStart(2, '0')}</span>
-        <span class="chapter-name" title="${ch.name}">${ch.name}</span>
-        <span class="chapter-ext">${ch.ext}</span>
-      `;
-      item.addEventListener('click', () => selectChapter(i));
-      chapterList.appendChild(item);
+    const total = state.chapters.length;
+    const CHUNK = 120;                       // 每块 120 个节点，插完视情况让出主线程
+    const frag = document.createDocumentFragment();
+    let built = 0;
+    let lastYield = Date.now();
+
+    while (built < total) {
+      const end = Math.min(built + CHUNK, total);
+      for (let i = built; i < end; i++) {
+        frag.appendChild(buildChapterItem(state.chapters[i], i));
+      }
+      chapterList.appendChild(frag);         // frag 插入后会自动清空，可复用
+      built = end;
+
+      if (built < total) {
+        if (onProgress) onProgress(built / total, `生成目录 · ${built} / ${total}`);
+        if (Date.now() - lastYield >= SCAN_YIELD_MS) {
+          await yieldToUI();
+          lastYield = Date.now();
+        }
+      }
+    }
+
+    if (onProgress) onProgress(1, `生成目录 · ${total} / ${total}`);
+  }
+
+  // 只刷新"当前章节"相关的 UI，不重新读文件（拖拽重排后专用）
+  function syncActiveUI() {
+    chapterList.querySelectorAll('.chapter-item').forEach((el, i) => {
+      el.classList.toggle('active', i === state.currentIndex);
     });
+    if (state.currentIndex >= 0 && state.chapters.length > 0) {
+      progressText.textContent = `${state.currentIndex + 1} / ${state.chapters.length}`;
+      saveProgress();
+    }
   }
 
   function selectChapter(index) {
@@ -1132,9 +1560,7 @@ body {
     const chapter = state.chapters[index];
 
     // Update active state
-    chapterList.querySelectorAll('.chapter-item').forEach((el, i) => {
-      el.classList.toggle('active', i === index);
-    });
+    syncActiveUI();
 
     // Scroll active into view
     const activeItem = chapterList.querySelector('.chapter-item.active');
@@ -1259,6 +1685,7 @@ body {
   function saveProgress() {
     if (state.chapters.length === 0) return;
     const ch = state.chapters[state.currentIndex];
+    if (!ch) return;
     localStorage.setItem('qingyue_progress', JSON.stringify({
       fileName: ch.name,
       index: state.currentIndex,
@@ -1289,70 +1716,210 @@ body {
 
   // ========== Drag & Drop ==========
   let dragCounter = 0;
+  const INTERNAL_MIME = 'application/x-qingyue-chapter';
+
+  // 只有"外部文件"拖入才走遮罩通道；内部拖拽（章节重排/打开）走独立通道
+  function hasFiles(e) {
+    const types = e.dataTransfer && e.dataTransfer.types;
+    if (!types) return false;
+    return Array.prototype.indexOf.call(types, 'Files') !== -1;
+  }
+
+  function resetDragState() {
+    dragCounter = 0;
+    dragOverlay.classList.remove('show');
+    dropzone.classList.remove('drag-over');
+    readingArea.classList.remove('internal-drop');
+    clearDropIndicator();
+  }
 
   function handleDragEnter(e) {
+    if (!hasFiles(e)) return;
     e.preventDefault();
     dragCounter++;
     dragOverlay.classList.add('show');
   }
 
   function handleDragLeave(e) {
+    if (!hasFiles(e)) return;
     e.preventDefault();
     dragCounter--;
-    if (dragCounter <= 0) {
+    // 指针贴到窗口边界说明真的拖出去了，此时强制归零，避免遮罩卡住
+    const leftWindow =
+      e.clientX <= 0 || e.clientY <= 0 ||
+      e.clientX >= window.innerWidth - 1 || e.clientY >= window.innerHeight - 1;
+    if (dragCounter <= 0 || leftWindow) {
       dragCounter = 0;
       dragOverlay.classList.remove('show');
     }
   }
 
   function handleDragOver(e) {
+    if (!hasFiles(e)) return;
     e.preventDefault();
+    // 显式声明期望效果：effectAllowed 为 uninitialized 时，
+    // 只 preventDefault 不设 dropEffect 仍会显示禁止光标
+    e.dataTransfer.dropEffect = 'copy';
+  }
+
+  // ---------- 内部拖拽：章节节点 ----------
+
+  function onChapterDragStart(e, index, el) {
+    state.dragIndex = index;
+    el.classList.add('dragging');
+    try {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData(INTERNAL_MIME, String(index));
+      e.dataTransfer.setData('text/plain', state.chapters[index].name);
+    } catch (err) {}
+  }
+
+  function onChapterDragEnd() {
+    state.dragIndex = -1;
+    chapterList.querySelectorAll('.chapter-item.dragging')
+      .forEach(el => el.classList.remove('dragging'));
+    clearDropIndicator();
+    readingArea.classList.remove('internal-drop');
+  }
+
+  function listItems() {
+    return Array.prototype.slice.call(chapterList.querySelectorAll('.chapter-item'));
+  }
+
+  function clearDropIndicator() {
+    listItems().forEach(el => el.classList.remove('drop-before', 'drop-after'));
+  }
+
+  // 根据指针纵向位置算出"应插入到第几个位置"（取值 0 ~ n）
+  function computeInsertIndex(clientY) {
+    const items = listItems();
+    for (let i = 0; i < items.length; i++) {
+      const rect = items[i].getBoundingClientRect();
+      if (clientY < rect.top + rect.height / 2) return i;
+    }
+    return items.length;
+  }
+
+  function paintDropIndicator(insertAt) {
+    const items = listItems();
+    clearDropIndicator();
+    if (items.length === 0) return;
+    if (insertAt >= items.length) {
+      items[items.length - 1].classList.add('drop-after');
+    } else {
+      items[insertAt].classList.add('drop-before');
+    }
+  }
+
+  // 把 from 位置的章节移动到 insertAt 这个插入位置之前
+  async function moveChapter(from, insertAt) {
+    const n = state.chapters.length;
+    if (from < 0 || from >= n) return;
+    const to = insertAt > from ? insertAt - 1 : insertAt;
+    if (to === from || to < 0 || to > n - 1) return;
+
+    // 用对象引用反查新下标，比手写位移公式可靠
+    const current = state.chapters[state.currentIndex] || null;
+    const moved = state.chapters.splice(from, 1)[0];
+    state.chapters.splice(to, 0, moved);
+    state.currentIndex = current ? state.chapters.indexOf(current) : -1;
+
+    // 先给反馈，再重建列表（长篇重建要分块让出主线程，提示不该跟着等）
+    showToast(`已将《${moved.name}》移到第 ${to + 1} 章`);
+
+    await renderChapterList();
+    syncActiveUI();
   }
 
   function handleDrop(e) {
+    // 内部拖拽由各自的落点处理，这里不接管，也不弹"格式不支持"的误导提示
+    if (!hasFiles(e)) return;
     e.preventDefault();
     dragCounter = 0;
     dragOverlay.classList.remove('show');
 
-    const items = e.dataTransfer.items;
-    if (items) {
-      const filePromises = [];
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : null;
-        if (item) {
-          filePromises.push(traverseEntry(item));
-        } else if (items[i].kind === 'file') {
-          const file = items[i].getAsFile();
-          if (file) filePromises.push(Promise.resolve([file]));
+    const dataTransfer = e.dataTransfer;
+    const files = [];
+
+    // 策略一：优先用 items[i].getAsFile() —— 最通用、最可靠的方式
+    if (dataTransfer.items && dataTransfer.items.length > 0) {
+      let usedGetAsFile = false;
+      for (let i = 0; i < dataTransfer.items.length; i++) {
+        const item = dataTransfer.items[i];
+        if (item.kind === 'file') {
+          const f = item.getAsFile();
+          if (f) {
+            files.push(f);
+            usedGetAsFile = true;
+          }
         }
       }
-      Promise.all(filePromises).then(results => {
-        const allFiles = results.flat();
-        handleFiles(allFiles);
-      });
-    } else {
-      handleFiles(e.dataTransfer.files);
+      // 如果用 getAsFile 拿到了东西，直接处理（单文件拖拽到此为止）
+      if (usedGetAsFile) {
+        handleFiles(files);
+        return;
+      }
     }
+
+    // 策略二：兜底用 dataTransfer.files
+    if (dataTransfer.files && dataTransfer.files.length > 0) {
+      const fileList = dataTransfer.files;
+      for (let i = 0; i < fileList.length; i++) {
+        files.push(fileList[i]);
+      }
+      if (files.length > 0) {
+        handleFiles(files);
+        return;
+      }
+    }
+
+    // 策略三：最后尝试 webkitGetAsEntry （仅用于文件夹拖放场景）
+    if (dataTransfer.items && dataTransfer.items.length > 0) {
+      const entries = [];
+      for (let i = 0; i < dataTransfer.items.length; i++) {
+        const item = dataTransfer.items[i];
+        if (item.webkitGetAsEntry) {
+          const entry = item.webkitGetAsEntry();
+          if (entry) entries.push(entry);
+        }
+      }
+      if (entries.length > 0) {
+        Promise.all(entries.map(traverseEntry)).then(results => {
+          const allFiles = results.flat();
+          handleFiles(allFiles);
+        });
+        return;
+      }
+    }
+
+    // 什么都没拿到
+    showToast('未找到支持的文件格式（.txt / .md）');
   }
 
   function traverseEntry(entry) {
     return new Promise((resolve) => {
       if (entry.isFile) {
-        entry.file(file => resolve([file]), () => resolve([]));
+        entry.file(
+          file => resolve([file]),
+          () => resolve([])
+        );
       } else if (entry.isDirectory) {
         const reader = entry.createReader();
         const allEntries = [];
         const readBatch = () => {
-          reader.readEntries(entries => {
-            if (entries.length === 0) {
-              Promise.all(allEntries.map(traverseEntry)).then(results => {
-                resolve(results.flat());
-              });
-            } else {
-              allEntries.push(...entries);
-              readBatch();
-            }
-          }, () => resolve([]));
+          reader.readEntries(
+            entries => {
+              if (entries.length === 0) {
+                Promise.all(allEntries.map(traverseEntry)).then(results => {
+                  resolve(results.flat());
+                });
+              } else {
+                allEntries.push(...entries);
+                readBatch();
+              }
+            },
+            () => resolve([])
+          );
         };
         readBatch();
       } else {
@@ -1376,7 +1943,6 @@ body {
     folderInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
         handleFiles(e.target.files);
-        if (!restoreProgress()) selectChapter(0);
       }
     });
 
@@ -1428,14 +1994,71 @@ body {
       }
     });
 
-    // Drag & Drop
+    // Drag & Drop —— 外部文件拖入
     document.addEventListener('dragenter', handleDragEnter);
     document.addEventListener('dragleave', handleDragLeave);
     document.addEventListener('dragover', handleDragOver);
     document.addEventListener('drop', handleDrop);
+    document.addEventListener('dragend', resetDragState);
+    window.addEventListener('blur', resetDragState);
 
-    // Dropzone click
-    $('#dropzone').addEventListener('click', () => fileInput.click());
+    // Dropzone：高亮反馈 + 点击选择文件
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      dropzone.classList.add('drag-over');
+    });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', () => dropzone.classList.remove('drag-over'));
+
+    // 章节节点拖拽 ①：在列表内上下拖动，重排章节顺序
+    chapterList.addEventListener('dragover', (e) => {
+      if (hasFiles(e) || state.dragIndex < 0) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      paintDropIndicator(computeInsertIndex(e.clientY));
+    });
+    chapterList.addEventListener('dragleave', (e) => {
+      if (hasFiles(e) || state.dragIndex < 0) return;
+      const r = chapterList.getBoundingClientRect();
+      const outside = e.clientX < r.left || e.clientX > r.right ||
+                      e.clientY < r.top || e.clientY > r.bottom;
+      if (outside) clearDropIndicator();
+    });
+    chapterList.addEventListener('drop', (e) => {
+      if (hasFiles(e) || state.dragIndex < 0) return;
+      e.preventDefault();
+      const from = state.dragIndex;
+      const insertAt = computeInsertIndex(e.clientY);
+      clearDropIndicator();
+      state.dragIndex = -1;
+      moveChapter(from, insertAt);
+    });
+
+    // 章节节点拖拽 ②：拖到右侧阅读区松手，直接打开该章
+    readingArea.addEventListener('dragover', (e) => {
+      if (hasFiles(e) || state.dragIndex < 0) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      readingArea.classList.add('internal-drop');
+    });
+    readingArea.addEventListener('dragleave', (e) => {
+      if (hasFiles(e) || state.dragIndex < 0) return;
+      const r = readingArea.getBoundingClientRect();
+      const outside = e.clientX < r.left || e.clientX > r.right ||
+                      e.clientY < r.top || e.clientY > r.bottom;
+      if (outside) readingArea.classList.remove('internal-drop');
+    });
+    readingArea.addEventListener('drop', (e) => {
+      if (hasFiles(e) || state.dragIndex < 0) return;
+      e.preventDefault();
+      const idx = state.dragIndex;
+      state.dragIndex = -1;
+      readingArea.classList.remove('internal-drop');
+      if (idx >= 0 && idx < state.chapters.length) selectChapter(idx);
+    });
 
     // Window resize
     window.addEventListener('resize', () => {
