@@ -126,26 +126,30 @@
                      {
                          "id":  "agentkit",
                          "name":  "AgentKit · AI 代理工具包",
-                         "tagline":  "435 专业 AI Agent，任何环境即插即用",
-                         "description":  "便携式 435 专业 AI 代理系统，纯 Markdown 代理库，覆盖 14 大分类领域。零依赖、平台无关，支持 CLI 查询、复制粘贴、文件引用等多种使用方式，可在任何 AI 环境中即插即用。",
+                         "tagline":  "463 专业 AI Agent，任何环境即插即用",
+                         "description":  "便携式 463 专业 AI 代理系统，纯 Markdown 代理库，覆盖 15 大分类领域。零依赖、平台无关，支持 CLI 查询、复制粘贴、文件引用等多种使用方式，可在任何 AI 环境中即插即用。",
                          "category":  "tools",
                          "icon":  "🤖",
                          "cover":  "",
                          "features":  [
-                                          "435 个专业 Agent：覆盖编程语言、框架、DevOps、安全、数据AI/营销增长/医疗/GIS 等 14 大领域",
+                                          "463 个专业 Agent：覆盖编程语言、框架、DevOps、安全、数据AI/游戏开发/营销增长/医疗/GIS 等 15 大领域",
                                           "CLI 工具：npx agentkit find/get/list/search 快速检索",
                                           "零依赖运行：纯 Markdown 文件，Node.js ≥ 16 即可",
                                           "平台无关：适用于 Claude、ChatGPT、Cursor、Copilot 等任何 AI 环境",
                                           "多格式引用：复制粘贴、@引用、System Prompt、文件包含、CLI 管道",
-                                          "分类浏览：14 大分类，按语言/框架/领域快速定位",
+                                          "上游全量对齐：与 agency-agents 282 个代理逐一对照，覆盖率 100%（282/282）",
+                                          "知识增量补写：280+ 代理补入 API/命令/配置/阈值级落地细节（缺口降 56%）",
+                                          "构建校验：src/verify.js 保证格式合规与索引↔磁盘 1:1 一致",
+                                          "分类浏览：15 大分类，按语言/框架/领域快速定位",
                                           "全文搜索：按名称、标签、分类关键词模糊匹配",
                                           "IDE 适配：支持 CLAUDE.md、.cursorrules 等配置文件引用",
                                           "开源协议：MIT License，自由使用和分发",
                                           "持续更新：社区驱动，持续扩充 Agent 库"
                                       ],
                          "highlights":  [
-                                            "435 个专业 Agent，14 大分类领域",
+                                            "463 个专业 Agent，15 大分类领域",
                                             "零依赖纯 Markdown，即插即用",
+                                          "新增 Game Development 分类：15 个 Unity / Unreal / Godot / Roblox 代理",
                                             "平台无关，兼容所有 AI 环境",
                                             "内置 CLI 工具，命令行快速检索"
                                         ],
@@ -162,8 +166,8 @@
                                    },
                          "githubRepo":  "agentkit",
                          "stars":  0,
-                         "version":  "2.0.0",
-                         "updateDate":  "2026-09-19",
+                         "version":  "3.0.0",
+                         "updateDate":  "2026-10-09",
                          "order":  1
                      },
                      {
