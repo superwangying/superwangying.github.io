@@ -1,580 +1,768 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LongShot · 长截图工具 — Windows 极简绿色长截图工具</title>
-  <meta name="description" content="LongShot 是一款 Windows 极简绿色长截图工具：单文件 exe、零依赖零联网、滚动拼接一次成型，支持区域截图、红框标注、滚动长截图。">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📸</text></svg>">
-  <style>
-    :root {
-      --bg: #0a0e14;
-      --bg-secondary: #0f1419;
-      --bg-card: #131a22;
-      --bg-card-hover: #18202b;
-      --border: #1f2a37;
-      --text: #e6edf3;
-      --text-secondary: #8b949e;
-      --text-muted: #6e7681;
-      --accent: #58a6ff;
-      --accent-glow: rgba(88, 166, 255, 0.15);
-      --green: #3fb950;
-      --green-glow: rgba(63, 185, 80, 0.15);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-    .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LongShot · 长截图工具 — Windows 极简绿色长截图工具</title>
+<meta name="description" content="LongShot 是一款 Windows 极简绿色长截图工具：单文件 exe、零依赖零联网、滚动拼接一次成型，支持区域截图、红框标注、滚动长截图。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📸</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Navigation */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: rgba(10, 14, 20, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 14px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .nav-logo {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .nav-logo .logo-icon { font-size: 22px; }
-    .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; gap: 24px; align-items: center; }
-    .nav-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--accent); }
+:root {
+  --bg: #ffffff;
+  --bg-secondary: #fafafa;
+  --fg: #000000;
+  --fg-secondary: #222222;
+  --fg-muted: #666666;
+  --border: #e5e5e5;
+  --accent: #000000;
+  --card-hover: #f5f5f5;
+  --pill-bg: #f0f0f0;
+  --pill-fg: #333333;
+  --code-bg: #f5f5f5;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --teal: #0d9488;
+  --teal-light: #ccfbf1;
+}
 
-    /* Hero */
-    .hero {
-      padding: 140px 0 60px;
-      text-align: center;
-      position: relative;
-    }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -200px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      background: var(--green-glow);
-      border: 1px solid rgba(63, 185, 80, 0.3);
-      border-radius: 100px;
-      font-size: 13px;
-      color: var(--green);
-      margin-bottom: 24px;
-    }
-    .hero-badge .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .hero h1 {
-      font-size: 44px;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 16px;
-      letter-spacing: -0.02em;
-    }
-    .hero h1 .highlight {
-      background: linear-gradient(135deg, var(--accent) 0%, #a371f7 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero .subtitle {
-      font-size: 18px;
-      color: var(--text-secondary);
-      max-width: 700px;
-      margin: 0 auto 32px;
-    }
-    .hero-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 36px;
-    }
-    .hero-tag {
-      padding: 6px 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .btn {
-      padding: 12px 28px;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: #79b8ff;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(88, 166, 255, 0.3);
-    }
-    .btn-secondary {
-      background: var(--bg-card);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn-secondary:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: translateY(-2px);
-    }
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --bg-secondary: #111111;
+  --fg: #e8e8e8;
+  --fg-secondary: #cccccc;
+  --fg-muted: #999999;
+  --border: #1a1a1a;
+  --accent: #ffffff;
+  --card-hover: #1a1a1a;
+  --pill-bg: #1e1e1e;
+  --pill-fg: #bbbbbb;
+  --code-bg: #161616;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+  --teal: #2dd4bf;
+  --teal-light: #0a2926;
+}
 
-    /* Section */
-    .section { padding: 72px 0; }
-    .section-title {
-      font-size: 32px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    .section-desc {
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 16px;
-      margin-bottom: 48px;
-    }
+html { scroll-behavior: smooth; }
 
-    /* Screenshots */
-    .screenshot {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--bg-secondary);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      margin-bottom: 28px;
-    }
-    .screenshot img { display: block; width: 100%; height: auto; }
-    .screenshot-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 28px; }
-    .screenshot-scroll {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--bg-secondary);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      margin-bottom: 28px;
-      position: relative;
-    }
-    .screenshot-scroll .scroll-inner {
-      max-height: 640px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: var(--accent) var(--bg-secondary);
-    }
-    .screenshot-scroll .scroll-inner::-webkit-scrollbar { width: 8px; }
-    .screenshot-scroll .scroll-inner::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    .screenshot-scroll .scroll-inner::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
-    .screenshot-scroll img { display: block; width: 100%; height: auto; }
-    .screenshot-scroll .scroll-hint {
-      position: sticky;
-      bottom: 0;
-      display: block;
-      text-align: center;
-      padding: 10px;
-      background: linear-gradient(transparent, rgba(10, 14, 20, 0.92));
-      color: var(--text-secondary);
-      font-size: 13px;
-      pointer-events: none;
-    }
-    .screenshot-caption {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-top: -16px;
-      margin-bottom: 32px;
-    }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.2s, color 0.2s;
+}
 
-    /* Feature Grid */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .feature-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      transition: all 0.3s;
-    }
-    .feature-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-      box-shadow: 0 8px 24px rgba(88, 166, 255, 0.1);
-    }
-    .feature-icon {
-      font-size: 32px;
-      margin-bottom: 14px;
-      display: block;
-    }
-    .feature-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-    .feature-desc { font-size: 14px; color: var(--text-secondary); }
+a { color: inherit; text-decoration: none; }
 
-    /* Download */
-    .download-box {
-      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 48px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .download-box::before {
-      content: '';
-      position: absolute;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 400px;
-      height: 200px;
-      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .download-box h3 { font-size: 24px; margin-bottom: 8px; }
-    .download-box .dl-sub { color: var(--text-secondary); font-size: 15px; margin-bottom: 28px; }
-    .dl-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-      justify-content: center;
-      margin-bottom: 32px;
-    }
-    .dl-meta-item { text-align: center; }
-    .dl-meta-item .dl-value { font-size: 20px; font-weight: 700; color: var(--accent); }
-    .dl-meta-item .dl-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .dl-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 40px;
-      background: var(--green);
-      color: #fff;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .dl-btn:hover { background: #2ea043; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(63, 185, 80, 0.3); }
-    .dl-note { margin-top: 20px; font-size: 12px; color: var(--text-muted); }
-    .dl-note code {
-      font-family: 'SF Mono', Consolas, monospace;
-      font-size: 11px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2px 8px;
-      word-break: break-all;
-    }
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
 
-    /* Tech Stack */
-    .tech-tags { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-    .tech-tag {
-      padding: 10px 20px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
-      color: var(--text-secondary);
-      transition: all 0.2s;
-    }
-    .tech-tag:hover { border-color: var(--accent); color: var(--accent); }
+/* ===== Nav ===== */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s, border-color 0.2s;
+}
+.nav .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+.nav-logo {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+.nav-logo:hover { color: var(--fg); }
+.nav-logo .logo-icon { font-size: 18px; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--fg);
+  transition: background 0.15s, border-color 0.15s;
+}
+.nav-btn:hover { background: var(--bg-secondary); }
+.nav-link {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--fg-muted);
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.15s;
+}
+.nav-link:hover { color: var(--fg); background: var(--bg-secondary); }
 
-    /* CTA */
-    .cta-box {
-      background: linear-gradient(135deg, rgba(88, 166, 255, 0.08) 0%, rgba(163, 113, 247, 0.08) 100%);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 48px;
-      text-align: center;
-    }
-    .cta-box h3 { font-size: 22px; margin-bottom: 10px; }
-    .cta-box p { color: var(--text-secondary); margin-bottom: 24px; }
+/* ===== Hero ===== */
+.hero {
+  padding: 80px 0 48px;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  margin-bottom: 24px;
+}
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.hero h1 {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero h1 .accent { color: var(--teal); }
+.hero .subtitle {
+  font-size: 15px;
+  color: var(--fg-secondary);
+  max-width: 600px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+.hero-tags {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.hero-tags span {
+  font-size: 11px;
+  color: var(--pill-fg);
+  background: var(--pill-bg);
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-secondary:hover { background: var(--bg-secondary); }
 
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 40px 0;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-    footer a { color: var(--accent); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-    .footer-note { margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+/* ===== Screenshots ===== */
+.screenshots {
+  padding: 32px 0 64px;
+}
+.screenshots-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+.screenshot-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.screenshot-item:hover {
+  box-shadow: var(--shadow-lg);
+}
+.screenshot-item img {
+  width: 100%;
+  display: block;
+}
+.screenshot-caption {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.screenshot-caption .caption-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+.screenshot-caption .caption-desc {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+.screenshot-dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+/* Scrollable long-screenshot viewer */
+.screenshot-scroll .scroll-inner {
+  max-height: 640px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--teal) var(--bg-secondary);
+}
+.screenshot-scroll .scroll-inner::-webkit-scrollbar { width: 8px; }
+.screenshot-scroll .scroll-inner::-webkit-scrollbar-track { background: var(--bg-secondary); }
+.screenshot-scroll .scroll-inner::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 4px; }
+.screenshot-scroll img { width: 100%; display: block; }
+.screenshot-caption .caption-hint {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--teal);
+}
 
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 32px; }
-      .features-grid { grid-template-columns: 1fr; }
-      .screenshot-pair { grid-template-columns: 1fr; }
-      .nav-links { display: none; }
-      .download-box { padding: 32px 20px; }
-      .screenshot-scroll .scroll-inner { max-height: 480px; }
-    }
-  </style>
+/* ===== Features ===== */
+.features {
+  padding: 64px 0;
+  border-top: 1px solid var(--border);
+}
+.features-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.feature-card {
+  background: var(--bg);
+  padding: 24px;
+  transition: background 0.15s;
+}
+.feature-card:hover { background: var(--bg-secondary); }
+.feature-icon {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+.feature-card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.feature-card p {
+  font-size: 12px;
+  color: var(--fg-secondary);
+  line-height: 1.6;
+}
+
+/* ===== Download ===== */
+.download-section {
+  padding: 64px 0;
+  border-top: 1px solid var(--border);
+}
+.download-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.download-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px 32px;
+  text-align: center;
+}
+.download-box .dl-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.download-box .dl-sub {
+  font-size: 12px;
+  color: var(--fg-muted);
+  margin-bottom: 32px;
+}
+.dl-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+.dl-meta-item {
+  background: var(--bg);
+  padding: 16px 8px;
+}
+.dl-meta-item .dl-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--teal);
+}
+.dl-meta-item .dl-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-top: 4px;
+}
+.dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 40px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.dl-btn:hover { opacity: 0.85; }
+.dl-note {
+  margin-top: 24px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  line-height: 1.8;
+}
+.dl-note code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  word-break: break-all;
+}
+
+/* ===== Tech Stack ===== */
+.tech-section {
+  padding: 48px 0 64px;
+  border-top: 1px solid var(--border);
+}
+.tech-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 16px;
+}
+.tech-stack {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tech-stack span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pill-fg);
+  background: var(--pill-bg);
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* ===== CTA / Contact ===== */
+.cta-section {
+  padding: 64px 0 80px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.cta-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+.cta-section p {
+  font-size: 14px;
+  color: var(--fg-secondary);
+  max-width: 520px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+.cta-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 1px solid var(--teal);
+  background: var(--teal-light);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+/* ===== Footer ===== */
+.footer {
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer p { font-size: 11px; color: var(--fg-muted); }
+.footer-links { display: flex; gap: 16px; }
+.footer-links a {
+  font-size: 11px;
+  color: var(--fg-muted);
+  transition: color 0.15s;
+}
+.footer-links a:hover { color: var(--fg); }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 28px; }
+  .hero .subtitle { font-size: 13px; }
+  .screenshot-dual {
+    grid-template-columns: 1fr;
+  }
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  .dl-meta {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .container { padding: 0 16px; }
+  .hero { padding: 56px 0 32px; }
+  .screenshot-scroll .scroll-inner { max-height: 480px; }
+}
+</style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav>
-    <div class="nav-content">
-      <a href="/" class="nav-logo">
-        <span class="logo-icon">📸</span>
-        Long<span>Shot</span>
-      </a>
-      <div class="nav-links">
-        <a href="#screenshots">产品截图</a>
-        <a href="#features">核心功能</a>
-        <a href="#download">下载</a>
-        <a href="#tech">技术栈</a>
-      </div>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="container">
+    <a href="/" class="nav-logo">
+      <span class="logo-icon">◆</span> SuperWangYing
+    </a>
+    <div class="nav-actions">
+      <a href="/#products" class="nav-link">← All Products</a>
+      <button class="nav-btn" id="themeBtn" aria-label="Toggle theme">■</button>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-badge">
-        <span class="dot"></span>
-        v0.3.3 · 持续迭代中
-      </div>
-      <h1>LongShot · <span class="highlight">Windows 极简长截图工具</span></h1>
-      <p class="subtitle">
-        单文件绿色 exe，零安装、零运行时依赖、零联网。滚动长截图一次成型，区域截图 + 红框标注开箱即用。
-      </p>
-      <div class="hero-tags">
-        <span class="hero-tag">📜 滚动长截图</span>
-        <span class="hero-tag">🖱️ 区域截图</span>
-        <span class="hero-tag">✏️ 红框标注</span>
-        <span class="hero-tag">📦 单文件 0.87 MB</span>
-        <span class="hero-tag">🔌 零依赖</span>
-        <span class="hero-tag">🚫 无联网行为</span>
-      </div>
-      <div class="hero-actions">
-        <a href="#download" class="btn btn-primary">⬇️ 立即下载</a>
-        <a href="#screenshots" class="btn btn-secondary">查看产品截图</a>
-      </div>
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      v0.3.3 · Ready to Download
     </div>
-  </section>
+    <h1>LongShot · <span class="accent">长截图工具</span></h1>
+    <p class="subtitle">
+      Windows 极简绿色长截图工具。<br>
+      单文件 exe · 零安装 · 零运行时依赖 · 零联网，<br>
+      滚动长截图一次成型，区域截图 + 红框标注开箱即用。
+    </p>
+    <div class="hero-tags">
+      <span>滚动长截图</span>
+      <span>区域截图</span>
+      <span>红框标注</span>
+      <span>单文件 0.87 MB</span>
+      <span>零依赖</span>
+      <span>零联网</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#download" class="btn-primary">Download ↓</a>
+      <a href="#screenshots" class="btn-secondary">View Screenshots</a>
+    </div>
+  </div>
+</section>
 
-  <!-- Screenshots -->
-  <section class="section" id="screenshots">
-    <div class="container">
-      <h2 class="section-title">产品截图</h2>
-      <p class="section-desc">真实运行画面：滚动长截图选区、区域截图标注操作条与拼接成品</p>
+<!-- Screenshots -->
+<section class="screenshots" id="screenshots">
+  <div class="container">
+    <div class="screenshots-label">Product Screenshots</div>
 
-      <div class="screenshot">
-        <img src="screenshot-scroll-entry.png" alt="滚动长截图 — 选区与操作条">
-      </div>
-      <p class="screenshot-caption">滚动长截图 · 全屏压暗选区，尺寸实时提示，单击「开始滚动」进入引擎</p>
-
-      <div class="screenshot-pair">
-        <div>
-          <div class="screenshot">
-            <img src="screenshot-region-bar.png" alt="区域截图 — 标注操作条">
-          </div>
-          <p class="screenshot-caption">区域截图 · 框选/复制/另存为操作条</p>
-        </div>
-        <div>
-          <div class="screenshot">
-            <img src="screenshot-annotation.png" alt="标注成品 — 红框烧录导出">
-          </div>
-          <p class="screenshot-caption">标注成品 · 红框直接烧录进导出图</p>
+    <div class="screenshot-grid">
+      <div class="screenshot-item">
+        <img src="screenshot-scroll-entry.png" alt="滚动长截图 — 选区与操作条" loading="lazy">
+        <div class="screenshot-caption">
+          <span class="caption-title">滚动长截图 · 选区与操作条</span>
+          <span class="caption-desc">全屏压暗选区 · 尺寸实时提示 · 单击「开始滚动」进入引擎</span>
         </div>
       </div>
 
-      <div class="screenshot-scroll">
+      <div class="screenshot-dual">
+        <div class="screenshot-item">
+          <img src="screenshot-region-bar.png" alt="区域截图 — 标注操作条" loading="lazy">
+          <div class="screenshot-caption">
+            <span class="caption-title">区域截图 · 操作条</span>
+            <span class="caption-desc">框选 / 复制 / 另存为</span>
+          </div>
+        </div>
+        <div class="screenshot-item">
+          <img src="screenshot-annotation.png" alt="标注成品 — 红框烧录导出" loading="lazy">
+          <div class="screenshot-caption">
+            <span class="caption-title">标注成品 · 红框烧录</span>
+            <span class="caption-desc">红框直接烧录进导出图</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screenshot-item screenshot-scroll">
         <div class="scroll-inner">
-          <img src="screenshot-long-result.png" alt="滚动长截图拼接成品">
-          <span class="scroll-hint">⬆ 滚动预览拼接成品 · 10 屏页面合成一张长图</span>
+          <img src="screenshot-long-result.png" alt="滚动长截图拼接成品" loading="lazy">
+        </div>
+        <div class="screenshot-caption">
+          <span class="caption-title">滚动拼接 · 长图成品</span>
+          <span class="caption-hint">↑ Scroll · 10 屏页面合成一张长图</span>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Features -->
-  <section class="section" id="features">
-    <div class="container">
-      <h2 class="section-title">核心功能</h2>
-      <p class="section-desc">围绕「滚动长截图」主线的完整能力闭环</p>
-      <div class="features-grid">
-        <div class="feature-card">
-          <span class="feature-icon">📜</span>
-          <div class="feature-title">滚动长截图引擎</div>
-          <div class="feature-desc">闭环滚动 + 稳定性检测 + 位移对账 + 逐帧拼接，自动处理吸顶导航与页内动画，滚不动自动降级换策略。</div>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🖱️</span>
-          <div class="feature-title">区域截图 + 红框标注</div>
-          <div class="feature-desc">全屏压暗、准线辅助、尺寸实时提示；选区内拖拽红框标注，一键烧录导出，复制/另存为随点随走。</div>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">📦</span>
-          <div class="feature-title">单文件绿色免安装</div>
-          <div class="feature-desc">一个 exe 就是全部：无需安装、不写注册表、不常驻后台服务、无任何网络行为，U 盘直接带走。</div>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">⌨️</span>
-          <div class="feature-title">托盘常驻 + 固定热键</div>
-          <div class="feature-desc">Ctrl+Alt+A 区域截图、Ctrl+Alt+S 滚动长截图，热键冲突自动降级备选组合，零配置开机即用。</div>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🎛️</span>
-          <div class="feature-title">捕获期 HUD</div>
-          <div class="feature-desc">长截图过程中可暂停/继续、结束并保存、一键放弃；到底确认窗自动兜底，防止半截作品。</div>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🧩</span>
-          <div class="feature-title">多格式导出</div>
-          <div class="feature-desc">PNG / JPG / WebP 按需切换，JPG 质量可调；编码器缺失自动降级，导出路径与格式在配置文件中集中管理。</div>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">📋</span>
-          <div class="feature-title">剪贴板集成</div>
-          <div class="feature-desc">截图完成自动进剪贴板，聊天窗口里 Ctrl+V 直接粘贴发送，零中间步骤。</div>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🗂️</span>
-          <div class="feature-title">会话管理与撤销</div>
-          <div class="feature-desc">每次长截图独立会话目录，帧序列顺序落盘；误操作可整会话清理重来，不残留垃圾文件。</div>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🔬</span>
-          <div class="feature-title">工程化验证</div>
-          <div class="feature-desc">348 条离线断言自检 + 滚动/吸顶/标注/性能端到端探针，全部可无人值守回归，构建零警告。</div>
-        </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-label">Core Features</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📜</div>
+        <h4>滚动长截图引擎</h4>
+        <p>闭环滚动 + 稳定性检测 + 位移对账 + 逐帧拼接，自动处理吸顶导航与页内动画，滚不动自动降级换策略。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖱️</div>
+        <h4>区域截图 + 红框标注</h4>
+        <p>全屏压暗、准线辅助、尺寸实时提示；选区内拖拽红框标注，一键烧录导出，复制/另存为随点随走。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h4>单文件绿色免安装</h4>
+        <p>一个 exe 就是全部：无需安装、不写注册表、不常驻后台服务、无任何网络行为，U 盘直接带走。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⌨️</div>
+        <h4>托盘常驻 + 固定热键</h4>
+        <p>Ctrl+Alt+A 区域截图、Ctrl+Alt+S 滚动长截图，热键冲突自动降级备选组合，零配置开机即用。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎛️</div>
+        <h4>捕获期 HUD</h4>
+        <p>长截图过程中可暂停/继续、结束并保存、一键放弃；到底确认窗自动兜底，防止半截作品。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧩</div>
+        <h4>多格式导出</h4>
+        <p>PNG / JPG / WebP 按需切换，JPG 质量可调；编码器缺失自动降级，导出路径与格式在配置文件中集中管理。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h4>剪贴板集成</h4>
+        <p>截图完成自动进剪贴板，聊天窗口里 Ctrl+V 直接粘贴发送，零中间步骤。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗂️</div>
+        <h4>会话管理与撤销</h4>
+        <p>每次长截图独立会话目录，帧序列顺序落盘；误操作可整会话清理重来，不残留垃圾文件。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔬</div>
+        <h4>工程化验证</h4>
+        <p>348 条离线断言自检 + 滚动/吸顶/标注/性能端到端探针，全部可无人值守回归，构建零警告。</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Download -->
-  <section class="section" id="download">
-    <div class="container">
-      <h2 class="section-title">下载使用</h2>
-      <p class="section-desc">下载即用，解压即绿色</p>
-      <div class="download-box">
-        <h3>LongShot v0.3.3</h3>
-        <p class="dl-sub">Windows 10 1809+ / Windows 11 · x64 · 单文件便携版</p>
-        <div class="dl-meta">
-          <div class="dl-meta-item">
-            <div class="dl-value">0.87 MB</div>
-            <div class="dl-label">单文件体积</div>
-          </div>
-          <div class="dl-meta-item">
-            <div class="dl-value">0</div>
-            <div class="dl-label">运行时依赖</div>
-          </div>
-          <div class="dl-meta-item">
-            <div class="dl-value">0</div>
-            <div class="dl-label">联网请求</div>
-          </div>
-          <div class="dl-meta-item">
-            <div class="dl-value">348</div>
-            <div class="dl-label">离线断言自检</div>
-          </div>
+<!-- Download -->
+<section class="download-section" id="download">
+  <div class="container">
+    <div class="download-label">Download</div>
+    <div class="download-box">
+      <div class="dl-title">LongShot v0.3.3</div>
+      <p class="dl-sub">Windows 10 1809+ / Windows 11 · x64 · 单文件便携版 · 下载即用</p>
+      <div class="dl-meta">
+        <div class="dl-meta-item">
+          <div class="dl-value">0.87<span style="font-size:12px;">MB</span></div>
+          <div class="dl-label">单文件体积</div>
         </div>
-        <a href="LongShot.exe" download class="dl-btn">⬇️ 下载 LongShot.exe</a>
-        <p class="dl-note">
-          SHA-256：<code>3321a19b8fd5c32b316589a229ae610bcef7d8e7b4c496d4863ddab46da20e8a</code><br>
-          下载后双击即可运行（SmartScreen 首次提示「仍要运行」），托盘图标常驻，Ctrl+Alt+A / Ctrl+Alt+S 立即体验。
-        </p>
+        <div class="dl-meta-item">
+          <div class="dl-value">0</div>
+          <div class="dl-label">运行时依赖</div>
+        </div>
+        <div class="dl-meta-item">
+          <div class="dl-value">0</div>
+          <div class="dl-label">联网请求</div>
+        </div>
+        <div class="dl-meta-item">
+          <div class="dl-value">348</div>
+          <div class="dl-label">离线断言自检</div>
+        </div>
       </div>
+      <a href="LongShot.exe" download class="dl-btn">⬇ Download LongShot.exe</a>
+      <p class="dl-note">
+        SHA-256：<code>3321a19b8fd5c32b316589a229ae610bcef7d8e7b4c496d4863ddab46da20e8a</code><br>
+        下载后双击即可运行（SmartScreen 首次提示「仍要运行」），托盘图标常驻，Ctrl+Alt+A / Ctrl+Alt+S 立即体验。
+      </p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Tech Stack -->
-  <section class="section" id="tech">
-    <div class="container">
-      <h2 class="section-title">技术实现</h2>
-      <p class="section-desc">纯 Win32 原生实现，无框架依赖，性能与体积兼得</p>
-      <div class="tech-tags">
-        <span class="tech-tag">C++17</span>
-        <span class="tech-tag">Win32 API</span>
-        <span class="tech-tag">WIC 图像编码</span>
-        <span class="tech-tag">GDI 屏幕捕获</span>
-        <span class="tech-tag">llvm-mingw 静态链接</span>
-        <span class="tech-tag">分层窗口合成</span>
-        <span class="tech-tag">低级键盘钩子</span>
-        <span class="tech-tag">SendInput 注入</span>
-      </div>
+<!-- Tech Stack -->
+<section class="tech-section">
+  <div class="container">
+    <div class="tech-label">Tech Stack</div>
+    <div class="tech-stack">
+      <span>C++17</span>
+      <span>Win32 API</span>
+      <span>WIC</span>
+      <span>GDI</span>
+      <span>llvm-mingw</span>
+      <span>Static Linking</span>
+      <span>Layered Windows</span>
+      <span>SendInput</span>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CTA -->
-  <section class="section">
-    <div class="container">
-      <div class="cta-box">
-        <h3>对 LongShot 感兴趣？</h3>
-        <p>产品持续迭代中，欢迎通过 GitHub 或留言反馈需求与问题。</p>
-        <a href="https://github.com/superwangying" target="_blank" class="btn btn-primary">Visit GitHub →</a>
-      </div>
+<!-- CTA / Contact -->
+<section class="cta-section" id="contact">
+  <div class="container">
+    <h2>对 LongShot 感兴趣？</h2>
+    <p>
+      产品持续迭代中，成品可直接下载体验。<br>
+      如果您有需求反馈或合作意向，欢迎留言，我们会尽快与您联系。
+    </p>
+    <div class="cta-box">
+      💬 欢迎留言反馈 · GitHub Issues / Discussions
     </div>
-  </section>
+    <div style="margin-top: 16px;">
+      <a href="https://github.com/superwangying" class="btn-secondary" style="display: inline-flex;">
+        Visit GitHub →
+      </a>
+    </div>
+  </div>
+</section>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <p>© 2026 LongShot · 自研工具系列</p>
-      <p class="footer-note"><a href="/">← 返回首页</a> · 产品目前为已完成成品，本页展示介绍、截图与成品下载。</p>
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>© 2026 SuperWangYing</p>
+    <div class="footer-links">
+      <a href="https://github.com/superwangying">GitHub</a>
+      <a href="/">Home</a>
     </div>
-  </footer>
+  </div>
+</footer>
+
+<!-- Theme Toggle -->
+<script>
+  const themeBtn = document.getElementById('themeBtn');
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    themeBtn.textContent = t === 'dark' ? '□' : '■';
+  }
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+</script>
+
 </body>
 </html>
