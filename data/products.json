@@ -1,6 +1,36 @@
 {
     "products":  [
                      {
+                         "id":  "longshot",
+                         "name":  "LongShot · 长截图工具",
+                         "tagline":  "Windows 极简绿色长截图工具：单文件 exe、零依赖零联网、滚动拼接一次成型",
+                         "description":  "LongShot 是一款 Windows 极简绿色长截图工具。单个 exe 仅 0.87 MB，零安装、零运行时依赖、无任何联网行为。核心为闭环滚动拼接引擎（稳定性检测 + 位移对账 + 逐帧拼接，自动处理吸顶导航与页内动画），配合区域截图、红框标注、托盘热键、捕获期 HUD、PNG/JPG/WebP 多格式导出与剪贴板集成。工程化验证完备：348 条离线断言 + 滚动/吸顶/标注/性能端到端探针，构建零警告。",
+                         "category":  "tools",
+                         "icon":  "📸",
+                         "cover":  "",
+                         "features":  [
+                                          "滚动长截图引擎（闭环滚动 + 稳定性检测 + 位移对账）",
+                                          "区域截图 + 红框标注，一键烧录导出",
+                                          "单文件绿色免安装（0.87 MB，零依赖）",
+                                          "托盘常驻 + 固定热键（Ctrl+Alt+A / Ctrl+Alt+S）",
+                                          "捕获期 HUD（暂停/继续/保存/放弃）",
+                                          "PNG / JPG / WebP 多格式导出",
+                                          "剪贴板自动集成",
+                                          "会话管理与撤销",
+                                          "348 条离线断言 + 端到端探针回归"
+                                      ],
+                         "highlights":  ["0.87 MB 单文件", "零依赖零联网", "348 离线断言", "C++17 原生实现"],
+                         "tech":  ["C++17", "Win32 API", "WIC", "llvm-mingw"],
+                         "status":  "active development",
+                         "links":  {
+                                       "demo":  "https://superwangying.github.io/products/longshot/"
+                                   },
+                         "githubRepo":  "superwangying.github.io",
+                         "version":  "0.3.3",
+                         "updateDate":  "2026-09-22",
+                         "order":  0
+                     },
+                     {
                          "id":  "chatark",
                          "name":  "ChatArk · AI 聊天记录管理器",
                          "tagline":  "多平台 AI 对话记录便携管理，纯本地 IndexedDB 存储",
