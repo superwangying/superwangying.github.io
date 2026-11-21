@@ -21,7 +21,7 @@
                                       ],
                          "highlights":  ["0.87 MB 单文件", "零依赖零联网", "348 离线断言", "C++17 原生实现"],
                          "tech":  ["C++17", "Win32 API", "WIC", "llvm-mingw"],
-                         "status":  "active development",
+                         "status":  "活跃开发",
                          "links":  {
                                        "demo":  "https://superwangying.github.io/products/longshot/"
                                    },
