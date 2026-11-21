@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobRadar · 求职雷达 — 大厂招聘动态监测系统</title>
+<meta name="description" content="个人向大厂招聘监测系统：定时采集公开社招职位，快照对比、订阅匹配、定向推送，并行追踪脉脉/牛客/V2EX 社区信号。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="container">
+    <a href="/" class="nav-logo">
+      <span class="logo-icon">◆</span> SuperWangYing
+    </a>
+    <div class="nav-actions">
+      <a href="/#products" class="nav-link">← All Products</a>
+      <a href="detail.html" class="nav-link primary">Engineering Detail</a>
+      <button class="nav-btn" id="themeBtn" aria-label="Toggle theme">■</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Preview · LIVE
+    </div>
+    <h1>JobRadar · <span class="accent">求职雷达</span></h1>
+    <p class="subtitle">
+      个人向大厂招聘监测系统。<br>
+      定时采集公开社招职位 → 快照对比 → 订阅规则匹配 → 定向推送 → Web 查看分析，<br>
+      并行追踪脉脉 / 牛客 / V2EX 社区信号，把散落的招聘动态收敛成一张可行动的情报台。
+    </p>
+    <div class="hero-tags">
+      <span>招聘监测</span>
+      <span>快照 Diff</span>
+      <span>订阅匹配</span>
+      <span>定向推送</span>
+      <span>社区信号</span>
+      <span>采集健康</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#screenshots" class="btn-primary">View Screenshots ↓</a>
+      <a href="detail.html" class="btn-secondary">Engineering Detail →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Screenshots -->
+<section class="screenshots" id="screenshots">
+  <div class="container">
+    <div class="screenshots-label">Product Screenshots</div>
+
+    <div class="screenshot-grid">
+      <div class="screenshot-item">
+        <img src="screenshot-overview.png" alt="JobRadar 工作台总览 — 数据在册、30 天趋势、最新动态" loading="lazy">
+        <div class="screenshot-caption">
+          <span class="caption-title">总览 · 招聘情报工作台</span>
+          <span class="caption-desc">核心指标 + 30 天新增趋势 + 最新动态流</span>
+        </div>
+      </div>
+
+      <div class="screenshot-dual">
+        <div class="screenshot-item">
+          <img src="screenshot-alerts.png" alt="JobRadar 提醒中心 — 新增/下架事件与未读统计" loading="lazy">
+          <div class="screenshot-caption">
+            <span class="caption-title">提醒中心 · 事件流</span>
+            <span class="caption-desc">新增 / 下架 / 变更分类 + 未读聚合</span>
+          </div>
+        </div>
+        <div class="screenshot-item">
+          <img src="screenshot-subscriptions.png" alt="JobRadar 订阅管理 — 关键词、城市与推送规则" loading="lazy">
+          <div class="screenshot-caption">
+            <span class="caption-title">订阅管理 · 匹配规则</span>
+            <span class="caption-desc">关键词 + 城市 + 全字段匹配，开关即时生效</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screenshot-item">
+        <img src="screenshot-health.png" alt="JobRadar 采集健康 — 数据源成功率与失败任务" loading="lazy">
+        <div class="screenshot-caption">
+          <span class="caption-title">健康面板 · 可观测性</span>
+          <span class="caption-desc">数据源成功率 + 信号管线状态 + 失败任务重试</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+  <div class="container">
+    <div class="features-label">Core Features</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🏢</div>
+        <h4>19 家公司适配器</h4>
+        <p>18 家已验证启用，按公司公开接口分别适配；统一契约接入，同站点 2.2s 最小请求间隔。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h4>快照对比 Diff</h4>
+        <p>与上一份职位快照逐条对比，识别新增、变更、重新上架与下架四类事件，不漏一次变动。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h4>订阅规则匹配</h4>
+        <p>按关键词、城市与职位全字段建立订阅，命中后按用户聚合，避免同一事件重复打扰。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📣</div>
+        <h4>定向推送与摘要</h4>
+        <p>PushPlus / 企业微信机器人 / 日志三通道；10 分钟窗口聚合，失败重试 3 次，每日 21:30 汇总。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <h4>社区信号并行管线</h4>
+        <p>脉脉、V2EX、牛客三源公开帖独立采集，按公司别名归属，归类为内推 / 面经 / 招聘等信号。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h4>信号质量闸门</h4>
+        <p>时效（默认 3 天）与价值（最短正文、拒营销纯链接）双闸 fail-closed；低置信评论隔离审阅不推送。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h4>采集健康面板</h4>
+        <p>成功率、失败任务、队列与信号源熔断状态一屏可见，异常源单独重试不影响主采集链。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖥️</div>
+        <h4>六页静态工作台</h4>
+        <p>总览 / 订阅 / 提醒 / 公司库 / 健康 / 设置，FastAPI 直接托管纯静态多页，无需 npm 构建。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧪</div>
+        <h4>全链路工程验证</h4>
+        <p>Python + FastAPI + SQLite，176 项离线测试全通过；Playwright 逐页实弹断言，Docker 一体部署。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="tech-section">
+  <div class="container">
+    <div class="tech-label">Tech Stack</div>
+    <div class="tech-stack">
+      <span>Python 3.11+</span>
+      <span>FastAPI</span>
+      <span>SQLite / WAL</span>
+      <span>APScheduler</span>
+      <span>httpx</span>
+      <span>HTML / CSS / JavaScript</span>
+      <span>Pytest</span>
+      <span>Playwright</span>
+      <span>Docker</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / Contact -->
+<section class="cta-section" id="contact">
+  <div class="container">
+    <h2>对 JobRadar · 求职雷达 感兴趣？</h2>
+    <p>
+      这是个人向内部工具，当前仅展示介绍与截图，不提供公开实例。<br>
+      如果您想了解采集适配、信号治理或推送链路的实现细节，可以查看工程详解页，也欢迎留言交流。
+    </p>
+    <div class="cta-box">
+      💬 感兴趣者欢迎留言 · GitHub Issues / Discussions
+    </div>
+    <div style="margin-top: 16px;">
+      <a href="detail.html" class="btn-secondary" style="display: inline-flex;">Engineering Detail →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>© 2026 SuperWangYing</p>
+    <div class="footer-links">
+      <a href="https://github.com/superwangying">GitHub</a>
+      <a href="/">Home</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Theme Toggle -->
+<script>
+  const themeBtn = document.getElementById('themeBtn');
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    themeBtn.textContent = t === 'dark' ? '□' : '■';
+  }
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+</script>
+
+</body>
+</html>

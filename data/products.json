@@ -481,40 +481,47 @@
                          "order":  1
                      },
                      {
-                         "id":  "welcome",
-                         "name":  "更多产品即将上线",
-                         "tagline":  "持续构建中，敬请期待",
-                         "description":  "独立全栈开发者 SuperWangYing 的产品聚合展示。这里将汇集所有自研工具、开源项目和应用产品。每个产品都经过精心打磨，致力于提供优秀的开发者体验。",
+                         "id":  "jobradar",
+                         "name":  "JobRadar · 求职雷达",
+                         "tagline":  "个人向大厂招聘监测系统：定时采集、快照对比、订阅匹配、定向推送，社区信号同步追踪",
+                         "description":  "JobRadar 是一款个人向大厂招聘监测系统。定时采集 19 家公司的公开社招职位（18 家已验证启用），与上一份快照对比产出新增/变更/重新上架/下架事件，按订阅规则匹配后通过 PushPlus、企业微信或日志定向推送，每日 21:30 汇总。另有脉脉、V2EX、牛客三源社区信号并行管线，经过时效与价值双质量闸门后进入同一匹配与推送链路。提供总览、订阅、提醒、公司库、健康与设置六页静态工作台，由 FastAPI 直接托管。",
                          "category":  "tools",
-                         "icon":  "🚀",
+                         "icon":  "📡",
                          "cover":  "",
                          "features":  [
-                                          "自研工具：提升开发效率的实用工具集",
-                                          "开源项目：面向社区的开源贡献",
-                                          "应用产品：精心设计的应用体验",
-                                          "持续更新：保持活跃开发与迭代"
+                                          "19 家公司适配器，18 家验证启用，同站点 2.2s 限速采集",
+                                          "快照对比识别新增、变更、重新上架与下架四类事件",
+                                          "关键词 + 城市 + 全字段订阅规则匹配，同一事件只推一次",
+                                          "PushPlus / 企业微信 / 日志三通道，10 分钟窗口聚合与失败重试",
+                                          "脉脉 / V2EX / 牛客社区信号并行管线，双质量闸门 fail-closed",
+                                          "低置信评论隔离为 signal_review，独立熔断不污染正式信号流",
+                                          "采集健康面板：数据源成功率、失败任务与信号源状态一屏可见",
+                                          "FastAPI 直接托管的六页静态工作台，零 npm 构建依赖",
+                                          "176 项离线测试 + Playwright 逐页实弹断言"
                                       ],
                          "highlights":  [
-                                            "简约高级的极简设计风格",
-                                            "全平台自适应响应式布局",
-                                            "完善的分发渠道配置"
+                                            "19 家公司 / 18 家已验证启用",
+                                            "快照 Diff + 订阅规则 + 定向推送",
+                                            "脉脉 / 牛客 / V2EX 社区信号",
+                                            "六页 Web 工作台 + 采集健康面板"
                                         ],
                          "tech":  [
-                                      "HTML",
-                                      "CSS",
-                                      "JavaScript",
-                                      "GitHub Pages"
+                                      "Python",
+                                      "FastAPI",
+                                      "SQLite",
+                                      "APScheduler",
+                                      "Playwright"
                                   ],
                          "status":  "活跃开发",
                          "links":  {
-                                       "github":  "https://github.com/superwangying",
-                                       "website":  "https://superwangying.github.io"
+                                       "demo":  "https://superwangying.github.io/products/zhaop/",
+                                       "github":  "https://github.com/superwangying"
                                    },
                          "githubRepo":  "",
                          "stars":  0,
                          "version":  "1.0.0",
-                         "updateDate":  "2026-04-25",
-                         "order":  99
+                         "updateDate":  "2026-11-21",
+                         "order":  4
                      }
                  ],
     "categories":  [

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobRadar · 工程详解 — 采集、信号与推送链路</title>
+<meta name="description" content="JobRadar 求职雷达的工程实现详解：职位采集与快照 diff、社区信号质量闸门、订阅匹配与定向推送、静态工作台与验证体系。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="container">
+    <a href="/" class="nav-logo">
+      <span class="logo-icon">◆</span> SuperWangYing
+    </a>
+    <div class="nav-actions">
+      <a href="/#products" class="nav-link">← All Products</a>
+      <a href="index.html" class="nav-link primary">← Channel</a>
+      <button class="nav-btn" id="themeBtn" aria-label="Toggle theme">■</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Engineering Detail
+    </div>
+    <h1>JobRadar · <span class="accent">工程详解</span></h1>
+    <p class="subtitle">
+      一条职位采集主链，加一条并行的社区信号链。<br>
+      两者共享同一套订阅匹配与推送出口，但各自熔断、各自限速、各自可观测。<br>
+      下面按数据流顺序拆解每个环节的职责与边界。
+    </p>
+    <div class="hero-tags">
+      <span>数据采集</span>
+      <span>快照 Diff</span>
+      <span>信号治理</span>
+      <span>推送去重</span>
+      <span>可观测性</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#pipeline" class="btn-primary">View Pipeline ↓</a>
+      <a href="index.html" class="btn-secondary">← Back to Channel</a>
+    </div>
+  </div>
+</section>
+
+<!-- Pipeline -->
+<section class="detail-section" id="pipeline">
+  <div class="container">
+    <div class="section-label">Data Pipeline</div>
+
+    <div class="flow-label">主链 · 公开社招职位</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="step-num">01 / COLLECT</div>
+        <h4>适配器采集</h4>
+        <p>19 家公司配置、18 家验证启用；按域名 2.2s 限速，每日 21:00 起调度。</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">02 / DIFF</div>
+        <h4>快照对比</h4>
+        <p>与上一份快照逐条对照，产出 added / changed / removed / readded 四类事件。</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">03 / MATCH</div>
+        <h4>订阅匹配</h4>
+        <p>关键词、城市与全字段规则命中；按用户聚合，同一事件只推一次。</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">04 / NOTIFY</div>
+        <h4>定向推送</h4>
+        <p>PushPlus / 企业微信 / 日志，10 分钟窗口合并，失败重试 3 次。</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">05 / DIGEST</div>
+        <h4>每日汇总</h4>
+        <p>21:30 汇总当日事件与信号，结构化落入推送正文。</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">06 / VIEW</div>
+        <h4>Web 查看分析</h4>
+        <p>六页静态工作台直接由 FastAPI 托管，无需前端构建步骤。</p>
+      </div>
+    </div>
+
+    <div class="flow-label">并行链 · 社区信号（独立熔断，共享出口）</div>
+    <div class="flow parallel">
+      <div class="flow-step">
+        <div class="step-num">S1 / SOURCES</div>
+        <h4>脉脉 / V2EX / 牛客</h4>
+        <p>公开页与 Atom feed；V2EX 可选代理，仅影响该源。</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">S2 / ATTRIBUTE</div>
+        <h4>别名归属</h4>
+        <p>最长别名优先、单归属；排除平台名，短别名要求招聘语境。</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">S3 / GATES</div>
+        <h4>双质量闸门</h4>
+        <p>时效 ≤ 3 天、正文 ≥ 12 字；拒营销与纯链接，fail-closed。</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">S4 / EVENT</div>
+        <h4>信号事件</h4>
+        <p>可证明来源与时间；低置信评论写入 signal_review 隔离审阅。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Specs -->
+<section class="detail-section">
+  <div class="container">
+    <div class="section-label">Key Specifications</div>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <h4><span class="mark">◆</span> 采集与快照</h4>
+        <dl>
+          <dt>公司配置</dt><dd>19 家，18 家验证启用</dd>
+          <dt>限速</dt><dd>同站点最小间隔 2.2s</dd>
+          <dt>全量耗时</dt><dd>18 家约 90 分钟（异步批处理）</dd>
+          <dt>事件类型</dt><dd>新增 / 变更 / 重新上架 / 下架</dd>
+          <dt>存储</dt><dd>SQLite（WAL 模式）</dd>
+        </dl>
+      </div>
+      <div class="spec-card">
+        <h4><span class="mark">◆</span> 社区信号</h4>
+        <dl>
+          <dt>信号源</dt><dd>脉脉 / V2EX / 牛客</dd>
+          <dt>分类</dt><dd>内推 / 面经 / 招聘等 5 类</dd>
+          <dt>时效闸</dt><dd>默认 3 天，无发布时间即丢弃</dd>
+          <dt>价值闸</dt><dd>最短正文 12 字，拒营销/纯链接</dd>
+          <dt>隔离</dt><dd>低置信评论进 signal_review，不推送</dd>
+        </dl>
+      </div>
+      <div class="spec-card">
+        <h4><span class="mark">◆</span> 匹配与推送</h4>
+        <dl>
+          <dt>规则</dt><dd>关键词 + 城市 + 职位全字段</dd>
+          <dt>去重</dt><dd>同一事件同一用户只推一次</dd>
+          <dt>聚合</dt><dd>即时推送 10 分钟窗口</dd>
+          <dt>重试</dt><dd>失败重试 3 次后标记 failed</dd>
+          <dt>渠道</dt><dd>PushPlus / 企业微信机器人 / 日志</dd>
+        </dl>
+      </div>
+      <div class="spec-card">
+        <h4><span class="mark">◆</span> Web 工作台</h4>
+        <dl>
+          <dt>页面</dt><dd>总览 / 订阅 / 提醒 / 公司库 / 健康 / 设置</dd>
+          <dt>形态</dt><dd>纯静态多页，FastAPI 直接托管</dd>
+          <dt>构建</dt><dd>无 npm 依赖，无前端构建步骤</dd>
+          <dt>鉴权</dt><dd>管理员种子账号 + JWT</dd>
+          <dt>主题</dt><dd>亮/暗双主题，本地持久化</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Observed scale -->
+<section class="detail-section">
+  <div class="container">
+    <div class="section-label">Observed Scale · 本地实测样本</div>
+    <div class="kv-grid">
+      <div class="kv"><b>19</b><span>公司配置</span></div>
+      <div class="kv"><b>36,932</b><span>职位记录</span></div>
+      <div class="kv"><b>7,799</b><span>事件记录</span></div>
+      <div class="kv"><b>31</b><span>每日统计</span></div>
+      <div class="kv"><b>70</b><span>采集轮次</span></div>
+    </div>
+    <div class="flow-label">验证记录</div>
+    <div class="notes">
+      <div class="note"><span class="tick">✓</span><span><b>176 项 pytest</b> 全通过：单元 / 适配器契约 / API 集成，全部离线 fixtures。</span></div>
+      <div class="note"><span class="tick">✓</span><span><b>Playwright 逐页实弹</b>：40/40 断言通过，健康面板 12/12 通过，无 console error、无失败请求。</span></div>
+      <div class="note"><span class="tick">✓</span><span><b>静态检查</b>：所有内联脚本 node --check 退出 0，compileall 退出 0。</span></div>
+      <div class="note"><span class="tick">✓</span><span><b>部署</b>：Docker 一体构建，数据与环境变量通过 volume 挂载。</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Design decisions -->
+<section class="detail-section">
+  <div class="container">
+    <div class="section-label">Design Decisions</div>
+    <div class="notes">
+      <div class="note"><span class="tick">01</span><span><b>信号宁缺毋滥</b>：分类为 other 直接丢弃；每帖只归属一家公司，无法证明发布时间的帖子一律不进正式流。</span></div>
+      <div class="note"><span class="tick">02</span><span><b>失败隔离</b>：信号源有独立熔断与 last_run 记录；单源不可达不影响职位主链，牛客首页空壳也有界重试三次。</span></div>
+      <div class="note"><span class="tick">03</span><span><b>前端零构建</b>：生产前端从 Vue 源码切换为 FastAPI 直接托管的静态多页，避免 npm 与构建链带来的部署漂移。</span></div>
+      <div class="note"><span class="tick">04</span><span><b>推送可验证</b>：设置页测试按钮用当前未保存配置真实发送并落库，失败不记假成功，webhook 密钥在错误信息中脱敏。</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Config -->
+<section class="detail-section">
+  <div class="container">
+    <div class="section-label">Configuration Surface</div>
+    <div class="code-block">
+<span class="c"># 采集调度</span>
+JOBRADAR_COLLECT_HOUR=21
+JOBRADAR_DIGEST_HOUR=21  JOBRADAR_DIGEST_MINUTE=30
+JOBRADAR_REQUEST_INTERVAL=2.2
+
+<span class="c"># 信号质量闸门</span>
+JOBRADAR_SIGNAL_MAX_AGE_DAYS=3
+JOBRADAR_SIGNAL_MIN_TEXT_LEN=12
+JOBRADAR_SIGNAL_PROXY=          <span class="c"># 仅 V2EX 使用</span>
+JOBRADAR_SIGNAL_QUARANTINE_ENABLED=true
+
+<span class="c"># 运行与存储</span>
+JOBRADAR_DATABASE_URL=sqlite:///./data/jobradar.db
+JOBRADAR_SCHEDULER_ENABLED=1
+JOBRADAR_ADMIN_USERNAME=admin  JOBRADAR_ADMIN_PASSWORD=***
+    </div>
+  </div>
+</section>
+
+<!-- CTA / Contact -->
+<section class="cta-section" id="contact">
+  <div class="container">
+    <h2>回到产品频道</h2>
+    <p>截图、功能全景与技术栈请回到频道页查看；如需交流实现细节，欢迎通过 GitHub Issues / Discussions 留言。</p>
+    <div class="cta-box">📡 JobRadar · 让招聘动态主动找到你</div>
+    <div style="margin-top: 16px;">
+      <a href="index.html" class="btn-secondary" style="display: inline-flex;">← Back to Channel</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>© 2026 SuperWangYing</p>
+    <div class="footer-links">
+      <a href="https://github.com/superwangying">GitHub</a>
+      <a href="/">Home</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Theme Toggle -->
+<script>
+  const themeBtn = document.getElementById('themeBtn');
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    themeBtn.textContent = t === 'dark' ? '□' : '■';
+  }
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+</script>
+
+</body>
+</html>
